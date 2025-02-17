@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const PORT = 8080;
+const PORT = 8082;
 const { sequelize } = require("./models");
 const indexRouter = require("./routes");
 const serverPerfix = "/api-server";
@@ -13,7 +13,7 @@ app.use(cors());
 app.use(serverPerfix, indexRouter);
 
 sequelize
-  .sync({ force: false })
+  .sync({ force: true, alter: true })
   .then(() => {
     app.listen(PORT, () => {
       console.log(`http://localhost:${PORT}`);
