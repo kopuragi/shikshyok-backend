@@ -27,7 +27,7 @@ const WalletModel = require("./Wallet")(sequelize, Sequelize);
 const ReviewModel = require("./Review")(sequelize, Sequelize);
 const ReviewfileModel = require("./Reviewfile")(sequelize, Sequelize);
 const SalesModel = require("./Sales")(sequelize, Sequelize);
-
+const OrderedMenu = require("./OrderedMenu")(sequelize, Sequelize);
 //db 관계 설정
 //메뉴-메뉴 첨부파일
 MenuModel.hasOne(MenufileModel, {
@@ -73,6 +73,8 @@ CustomerModel.hasMany(ReviewModel, {
   foreignKey: "cus_rev_id",
 });
 
+OrderModel.hasMany(OrderedMenu);
+OrderedMenu.belongsTo(OrderModel);
 //db 객체에 모델 추가
 db.Customer = CustomerModel;
 db.Owner = OwnerModel;
@@ -84,5 +86,5 @@ db.Wallet = WalletModel;
 db.Review = ReviewModel;
 db.Reviewfile = ReviewfileModel;
 db.Sales = SalesModel;
-
+db.OrderedMenu = OrderedMenu;
 module.exports = db;
