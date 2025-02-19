@@ -5,4 +5,7 @@ const controller = require("../controller/Cmain");
 // GET /api-server
 router.get("/", controller.getIndex);
 
+// GET /api-server/owner
+router.get("/owner", controller.getOwner);
+
 module.exports = router;
