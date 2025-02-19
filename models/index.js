@@ -23,6 +23,8 @@ const ShopModel = require("./Shop")(sequelize, Sequelize);
 const MenuModel = require("./Menu")(sequelize, Sequelize);
 const MenufileModel = require("./Menufile")(sequelize, Sequelize);
 const OrderModel = require("./Order")(sequelize, Sequelize);
+const OrderedMenuModel = require("./OrderedMenu")(sequelize, Sequelize);
+const OrderSummaryModel = require("./OrderSummary")(sequelize, Sequelize);
 const WalletModel = require("./Wallet")(sequelize, Sequelize);
 const ReviewModel = require("./Review")(sequelize, Sequelize);
 const ReviewfileModel = require("./Reviewfile")(sequelize, Sequelize);
@@ -38,6 +40,10 @@ MenuModel.hasOne(MenufileModel, {
 CustomerModel.hasOne(WalletModel, {
   foreignKey: "customer_id",
 });
+//고객-주문요약
+CustomerModel.hasOne(OrderSummaryModel, {
+  foreignKey: "sum_cus_id",
+});
 
 //리뷰-리뷰 첨부파일
 ReviewModel.hasOne(ReviewfileModel, {
@@ -46,6 +52,11 @@ ReviewModel.hasOne(ReviewfileModel, {
 //점주-가게
 OwnerModel.hasMany(ShopModel, {
   foreignKey: "owner_id",
+});
+
+//가게-주문요약
+ShopModel.hasOne(OrderSummaryModel, {
+  foreignKey: "sum_shop_id",
 });
 
 //가게-리뷰
@@ -80,6 +91,8 @@ db.Shop = ShopModel;
 db.Menu = MenuModel;
 db.Menufile = MenufileModel;
 db.Order = OrderModel;
+db.OrderedMenu = OrderedMenuModel;
+db.OrderSummaryMenu = OrderSummaryModel;
 db.Wallet = WalletModel;
 db.Review = ReviewModel;
 db.Reviewfile = ReviewfileModel;
