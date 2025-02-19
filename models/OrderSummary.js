@@ -28,7 +28,7 @@ const OrderSummary = (sequelize, DataTypes) => {
         onUpdate: "CASCADE",
       },
       orderSum: {
-        type: DataTypes.TEXT,
+        type: DataTypes.JSON,
         allowNull: false,
       },
       sumTotal: {
