@@ -1,23 +1,29 @@
-const OrderedMenu = (sequelize, DataTypes) => {
+const OrderMenu = (sequelize, DataTypes) => {
   return sequelize.define(
     "orderedMenu",
     {
-      id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-      },
-      orderMenu: {
+      menuName: {
         type: DataTypes.STRING(255),
-        allowNull: false,
+        allowNull: true,
       },
-      orderMenuPrice: {
-        type: DataTypes.INTEGER,
+      price: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
+      totalPrice: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
+      visitTime: {
+        type: DataTypes.DATE,
         allowNull: false,
       },
     },
-    { timestamps: false, freezeTableName: true }
+    {
+      timestamps: false,
+      freezeTableName: true,
+    }
   );
 };
 
-module.exports = OrderedMenu;
+module.exports = OrderMenu;
