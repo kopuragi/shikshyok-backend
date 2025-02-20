@@ -83,6 +83,11 @@ ShopModel.hasMany(MenuModel, {
 CustomerModel.hasMany(ReviewModel, {
   foreignKey: "cus_rev_id",
 });
+// ---- 추가
+ReviewModel.belongsTo(CustomerModel, {
+  foreignKey: "cus_rev_id",
+  as: "customer",
+});
 
 OrderModel.hasMany(OrderedMenu);
 OrderedMenu.belongsTo(OrderModel);

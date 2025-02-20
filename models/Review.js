@@ -39,6 +39,10 @@ const Review = (sequelize, DataTypes) => {
         type: DataTypes.DATE,
         allowNull: false,
       },
+      owner_review: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
     },
     { timestamps: false, freezeTableName: true }
   );
