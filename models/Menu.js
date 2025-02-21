@@ -33,10 +33,6 @@ const Menu = (sequelize, DataTypes) => {
         type: DataTypes.STRING(255),
         allowNull: false,
       },
-      menuTab: {
-        type: DataTypes.STRING(255),
-        allowNull: false,
-      },
     },
     { timestamps: false, freezeTableName: true }
   );
