@@ -45,6 +45,10 @@ CustomerModel.hasOne(OrderSummaryModel, {
   foreignKey: "sum_cus_id",
 });
 
+//고객-주문
+CustomerModel.hasMany(OrderModel, {
+  foreignKey: "cus_order_id",
+});
 //리뷰-리뷰 첨부파일
 ReviewModel.hasOne(ReviewfileModel, {
   foreignKey: "review_id",

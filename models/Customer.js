@@ -21,6 +21,7 @@ const Customer = (sequelize, DataTypes) => {
       },
       userid: {
         type: DataTypes.STRING(255),
+        unique: true,
         allowNull: false,
       },
       pw: {
