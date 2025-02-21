@@ -16,6 +16,8 @@ router.post("/income", income.income);
 
 // GET /api-sever/owner-review
 router.get("/owner-review", review.getOwnerReview);
+//patch /api-sever/owner-review/:id
+router.patch("/owner-review/:id", review.updateOwnerReview);
 
 //GET /api-server/menu-list
 router.get("/menu-list", menu.getMenus);
