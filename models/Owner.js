@@ -32,7 +32,7 @@ const Owner = (sequelize, DataTypes) => {
         allowNull: false,
       },
       join_date: {
-        type: DataTypes.STRING(255),
+        type: DataTypes.DATE,
         allowNull: false,
       },
       isDelete: {
@@ -43,15 +43,15 @@ const Owner = (sequelize, DataTypes) => {
         type: DataTypes.STRING(255),
         allowNull: false,
       },
-      shop_name: {
+      ownerShopname: {
         type: DataTypes.STRING(255),
         allowNull: false,
       },
-      shop_address: {
+      ownerShopaddress: {
         type: DataTypes.STRING(255),
         allowNull: false,
       },
-      shop_type: {
+      ownerShoptype: {
         type: DataTypes.STRING(255),
         allowNull: false,
       },
