@@ -1,4 +1,4 @@
--- Active: 1732688612707@@127.0.0.1@3306@sesac
+-- Active: 1739513174980@@127.0.0.1@3306@kopuragi
 #데이터베이스 생성
 CREATE DATABASE Kopuragi DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
 
@@ -43,3 +43,19 @@ INSERT INTO orderedMenu (menuName, price, totalPrice, visitTime) VALUES
 ('떡볶이', '4000', '8000', '2025-03-15 13:20:00'),
 ('라면', '3000', '6000', '2025-03-20 20:00:00'),
 ('삼겹살', '13000', '26000', '2025-03-25 16:30:00');
+
+#owner 샘플 데이터
+SELECT * FROM owner;
+INSERT INTO owner (name, nickname, userid, pw, email, phone, join_date, isDelete, businessNumber, ownerShopname, ownerShopaddress, ownerShoptype) VALUE 
+('임진우','지누','jinu0000','aaAA11!!','jinu@naver.com','010-0000-0000', '2025-01-01', false, '1111111111','스타벅스','서울시 도봉구','카페');
+
+
+#shop 테이블 샘플 데이터
+SELECT * FROM shop;
+INSERT INTO shop (owner_id, shopName, businessNumber, shopAddress, shopPhone, shopType, shopOwner) VALUES 
+(1, '투썸플레이스','1234567890','서울시 도봉구','02-222-2222','카페','이민철');
+
+#menu 테이블 샘플 데이터
+SELECT * FROM menu;
+INSERT INTO menu (shop_menu_id, menuName, price, menudesc, category) VALUES 
+(1, '얼그레이',4000,'시트러스 향이 나는 홍차','차');
