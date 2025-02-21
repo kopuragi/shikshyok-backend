@@ -46,3 +46,24 @@ exports.getOwnerReview = async (req, res) => {
     res.status(500).json({ message: "서버 오류가 발생했습니다." });
   }
 };
+
+//patch /api-sever/owner-review/:id
+exports.updateOwnerReview = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { owner_review } = req.body;
+
+    const review = await Review.findByPk(id);
+    if (!review) {
+      return res.status(404).json({ message: "리뷰를 찾을 수 없습니다." });
+    }
+
+    review.owner_review = owner_review;
+    await review.save();
+
+    res.status(200).json({ message: "리뷰가 수정되었습니다.", review });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+  }
+};

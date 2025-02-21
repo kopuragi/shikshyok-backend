@@ -15,5 +15,7 @@ router.post("/income", income.income);
 
 // GET /api-sever/owner-review
 router.get("/owner-review", review.getOwnerReview);
+//patch /api-sever/owner-review/:id
+router.patch("/owner-review/:id", review.updateOwnerReview);
 
 module.exports = router;
