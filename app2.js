@@ -77,14 +77,16 @@ io.on("connection", (socket) => {
       console.log("아이템=", item);
 
       // 주문 들어온 가게의 주인을 찾아 메시지 전송
-      const socketIds = connectedClients[item.loginId];
+      const socketIds = connectedClients[item.shopLoginId];
       if (socketIds) {
         socketIds.forEach((socketId) => {
           io.to(socketId).emit("order", item);
-          console.log(`메시지 전송: ${item.loginId}, socket.id: ${socketId}`);
+          console.log(
+            `메시지 전송: ${item.shopLoginId}, socket.id: ${socketId}`
+          );
         });
       } else {
-        console.log(`해당 클라이언트를 찾을 수 없습니다: ${item.loginId}`);
+        console.log(`해당 클라이언트를 찾을 수 없습니다: ${item.shopLoginId}`);
       }
     }
   });
