@@ -1,6 +1,6 @@
 const Customer = (sequelize, DataTypes) => {
   return sequelize.define(
-    "customer",
+    'customer',
     {
       id: {
         type: DataTypes.INTEGER,
@@ -44,11 +44,15 @@ const Customer = (sequelize, DataTypes) => {
         type: DataTypes.STRING(255),
         allowNull: false,
       },
+      membershipType: {
+        type: DataTypes.STRING(255),
+        allowNull: false,
+      },
     },
     {
       timestamps: false,
       freezeTableName: true,
-    }
+    },
   );
 };
 
