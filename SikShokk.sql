@@ -1,4 +1,4 @@
--- Active: 1732688612707@@127.0.0.1@3306@sesac
+-- Active: 1740067522043@@127.0.0.1@3306@kopuragi
 #데이터베이스 생성
 CREATE DATABASE Kopuragi DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
 
@@ -13,7 +13,8 @@ GRANT ALL PRIVILEGES ON *.* TO 'shikshokk'@'%' WITH GRANT OPTION;
 
 #계정이 제대로 생성되었는지 확인
 SHOW DATABASES;
-USE mysql;
+USE kopuragi;
+
 SELECT * FROM kopuragi;
 
 #??
