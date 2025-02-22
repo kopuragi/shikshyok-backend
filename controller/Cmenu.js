@@ -13,16 +13,23 @@ exports.getMenus = async (req, res) => {
 exports.createMenus = async (req, res) => {
   console.log("여기는 createMenus");
   console.log(req.body);
+  const { userid } = req.session.user;
   const findShopId = await Shop.findOne({
     where: {
-      userid: req.session.userId,
+      owner_id: userid,
       //세션에 저장된 userid를 조회해서
       //shop 정보를 가지고 온다.
       //shop_menu_id를 적는 데에 사용
+      //shop의 owner_id가
+      //customer의 userid가 같으면 된다.
     },
   });
+  console.log(findShopId); //findShopId에 shop 정보가 잘 나오는지 확인하자
+
+  const { shopid } = findShopId.data; //이게 맞나?
+
   const insertMenus = await Menu.create({
-    shop_menu_id: findShopId.id,
+    shop_menu_id: shopid,
     //맞는지 확인해보지는 않았다.
     //세션 저장이 완료되면 확인해봐야겠다.
     menuName: req.body.mname,
