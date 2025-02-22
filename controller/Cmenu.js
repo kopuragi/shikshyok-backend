@@ -5,7 +5,6 @@ exports.getMenus = async (req, res) => {
   const findMenus = await Menu.findAll();
   const findMenufiles = await Menufile.findAll();
   console.log("메뉴 조회!");
-  console.log(findMenus);
   console.log(findMenufiles);
   res.send(findMenus);
 };
