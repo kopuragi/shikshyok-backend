@@ -12,25 +12,21 @@ exports.getMenus = async (req, res) => {
 exports.createMenus = async (req, res) => {
   console.log("여기는 createMenus");
   console.log(req.body);
-  const { userid } = req.session.user;
-  const findShopId = await Shop.findOne({
-    where: {
-      owner_id: userid,
-      //세션에 저장된 userid를 조회해서
-      //shop 정보를 가지고 온다.
-      //shop_menu_id를 적는 데에 사용
-      //shop의 owner_id가
-      //customer의 userid가 같으면 된다.
-    },
-  });
-  console.log(findShopId); //findShopId에 shop 정보가 잘 나오는지 확인하자
+  // const { userid } = req.session.user;
+  // const findShopId = await Shop.findOne({
+  //   where: {
+  //     owner_id: userid,
+  //   },
+  // });
+  // console.log(findShopId);
 
-  const { shopid } = findShopId.data; //이게 맞나?
+  // const { shopid } = findShopId.data;
 
   const insertMenus = await Menu.create({
-    shop_menu_id: shopid,
-    //맞는지 확인해보지는 않았다.
-    //세션 저장이 완료되면 확인해봐야겠다.
+    shop_menu_id: 2,
+    //일단 임시로 아이디 값을 고정값으로 줬다.
+    //세션에 저장된 회원 아이디를 사용해서 유동적으로 가져와야 한다.
+    //데이터를 등록하는 기능 자체는 문제가 없다.
     menuName: req.body.mname,
     price: Number(req.body.mprice),
     menudesc: req.body.mdesc,
@@ -38,6 +34,31 @@ exports.createMenus = async (req, res) => {
   });
   //   const insertMenufile = await Menufile.create({});
   console.log(insertMenus);
-  // res.send("요청 성공");
-  res.sendL({ insertMenus });
+  res.send({ insertMenus });
+};
+
+//메뉴 정보 수정
+exports.updateMenus = async (req, res) => {
+  console.log("여기는 updateMenus");
+  console.log(req.body);
+  // const { userid } = req.session.user;
+  // const findShopId = await Shop.findOne({
+  //   where: {
+  //     owner_id: userid,
+  //   },
+  // });
+  // console.log(findShopId);
+
+  // const { shopid } = findShopId.data;
+
+  const insertMenus = await Menu.create({
+    shop_menu_id: 2,
+    menuName: req.body.mname,
+    price: Number(req.body.mprice),
+    menudesc: req.body.mdesc,
+    category: req.body.mcategory,
+  });
+  //   const insertMenufile = await Menufile.create({});
+  console.log(insertMenus);
+  res.send({ insertMenus });
 };

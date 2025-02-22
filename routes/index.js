@@ -33,6 +33,9 @@ router.get("/menu-list", menu.getMenus);
 // POST /api-server/menu-register
 router.post("/menu-register", menu.createMenus);
 
+// PATCH /api-server/menu-change
+router.patch("/menu-change", menu.updateMenus);
+
 // 회원가입
 router.post("/signup", userController.signUp);
 
