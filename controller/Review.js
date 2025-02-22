@@ -34,6 +34,7 @@ exports.getOwnerReview = async (req, res) => {
       content: review.content,
       writeTime: review.writeTime,
       owner_review: review.owner_review,
+      isDelete: review.isDelete,
       reviewfile: review.reviewfile ? review.reviewfile.saveRfile : null,
       customer_nickname: review.customer.nickname,
     }));
@@ -52,6 +53,8 @@ exports.updateOwnerReview = async (req, res) => {
   try {
     const { id } = req.params;
     const { owner_review } = req.body;
+    console.log(req.body);
+    console.log(req.body.data);
 
     const review = await Review.findByPk(id);
     if (!review) {
@@ -62,6 +65,46 @@ exports.updateOwnerReview = async (req, res) => {
     await review.save();
 
     res.status(200).json({ message: "리뷰가 수정되었습니다.", review });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+  }
+};
+
+// DELETE /api-server/owner-review/:id
+exports.deleteOwnerReview = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const review = await Review.findByPk(id);
+    if (!review) {
+      return res.status(404).json({ message: "리뷰를 찾을 수 없습니다." });
+    }
+    //destory가 아니라 null로
+    review.owner_review = null;
+    await review.save();
+
+    res.status(200).json({ message: "리뷰가 삭제되었습니다.", review });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+  }
+};
+
+// PATCH /api-server/owner-review (고객리뷰 삭제요청)
+exports.CusReviewDelete = async (req, res) => {
+  try {
+    const { id } = req.body;
+    console.log(id);
+
+    const review = await Review.findByPk(id);
+    if (!review) {
+      return res.status(404).json({ message: "리뷰를 찾을 수 없습니다." });
+    }
+
+    review.isDelete = "yes";
+    await review.save();
+
+    res.status(200).json({ message: "리뷰삭제 요청 완료", review });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "서버 오류가 발생했습니다." });

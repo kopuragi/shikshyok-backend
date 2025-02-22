@@ -43,6 +43,10 @@ const Review = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: true,
       },
+      isDelete: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
     },
     { timestamps: false, freezeTableName: true }
   );
