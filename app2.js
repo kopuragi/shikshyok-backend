@@ -62,35 +62,28 @@ io.on("connection", (socket) => {
 
   socket.on("connectCustomer", (data) => {
     console.log("Customer connected");
+    console.log("고객 커넥트 아이디", data);
     addClient(data);
   });
 
   socket.on("connectOwner", (data) => {
     console.log("Owner connected");
+    console.log("점주 커넥트 아이디=", data);
     addClient(data);
   });
 
   socket.on("order", (data) => {
     console.log("주문이 들어왔습니다.");
-    console.log(data);
-    for (let item of data) {
-      console.log("아이템=", item);
-
-      // 주문 들어온 가게의 주인을 찾아 메시지 전송
-      const socketIds = connectedClients[item.shopLoginId];
-      console.log("가게주인 id= ", item.shopLoginId);
-      if (socketIds) {
-        socketIds.forEach((socketId) => {
-          io.to(socketId).emit("order", item);
-          console.log(
-            `메시지 전송: ${item.shopLoginId}, socket.id: ${socketId}`
-          );
-        });
-      } else {
-        console.log(`해당 클라이언트를 찾을 수 없습니다: ${item.shopLoginId}`);
-      }
+    console.log("요기서 확인=", data);
+    const ownerId = data[0].shopLoginId;
+    console.log("onwerId = ", ownerId);
+    if (connectedClients[ownerId]) {
+      connectedClients[ownerId].forEach((clientId) => {
+        io.to(clientId).emit("order", data);
+      });
+    } else {
+      console.log(`No connected clients for ownerId: ${ownerId}`);
     }
-    console.log("정상주문보냄 클라이언트 해시 맵 === ");
   });
   socket.on("disconnect", () => {
     console.log("클라이언트 접속 해제", socket.id);
