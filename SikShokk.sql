@@ -59,5 +59,21 @@ INSERT INTO shop (owner_id, shopName, businessNumber, shopAddress, shopPhone, sh
 
 #menu 테이블 샘플 데이터
 SELECT * FROM menu;
+#menu 테이블의 내용을 전부 지운다.
+TRUNCATE TABLE menu;
 INSERT INTO menu (shop_menu_id, menuName, price, menudesc, category) VALUES 
 (1, '얼그레이',4000,'시트러스 향이 나는 홍차','차');
+INSERT INTO menu (shop_menu_id, menuName, price, menudesc, category) VALUES 
+(2, '페퍼민트',4000,'시트러스 향이 나는 홍차','차');
+INSERT INTO menu (shop_menu_id, menuName, price, menudesc, category) VALUES 
+(3, '아메리카노',4000,'시트러스 향이 나는 홍차','커피');
+INSERT INTO menu (shop_menu_id, menuName, price, menudesc, category) VALUES 
+(4, '카페라떼',4000,'시트러스 향이 나는 홍차','커피');
+INSERT INTO menu (shop_menu_id, menuName, price, menudesc, category) VALUES 
+(5, '마끼아또',4000,'시트러스 향이 나는 홍차','커피');
+INSERT INTO menu (shop_menu_id, menuName, price, menudesc, category) VALUES 
+(6, '오렌지 주스',4000,'시트러스 향이 나는 홍차','주스');
+INSERT INTO menu (shop_menu_id, menuName, price, menudesc, category) VALUES 
+(7, '딸기주스',4000,'시트러스 향이 나는 홍차','주스');
+INSERT INTO menu (shop_menu_id, menuName, price, menudesc, category) VALUES 
+(8, '사과주스',4000,'시트러스 향이 나는 홍차','주스');
