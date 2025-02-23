@@ -13,7 +13,7 @@ GRANT ALL PRIVILEGES ON *.* TO 'shikshokk'@'%' WITH GRANT OPTION;
 
 #계정이 제대로 생성되었는지 확인
 SHOW DATABASES;
-USE mysql;
+USE kopuragi;
 SELECT * FROM kopuragi;
 
 #??
@@ -22,6 +22,7 @@ FLUSH PRIVILEGES;
 SHOW TABLES ;
 
 SELECT * FROM orderedmenu;
+SELECT * FROM orderedvisitor;
 
 DELIMITER $$
 
@@ -31,6 +32,10 @@ INSERT INTO orderedMenu (menuName, price, totalPrice, visitTime) VALUES
 ('김치찌개', '8000', '16000', '2025-01-10 12:30:00'),
 ('김치찌개', '8000', '16000', '2025-01-10 12:30:00'),
 ('김치찌개', '8000', '16000', '2025-01-10 12:30:00'),
+('김치찌개', '8000', '16000', '2025-01-10 12:30:00'),
+('불고기', '8000', '16000', '2025-01-10 12:30:00'),
+('불고기', '8000', '16000', '2025-01-10 12:30:00'),
+('불고기', '8000', '16000', '2025-01-10 12:30:00'),
 ('불고기', '12000', '24000', '2025-01-22 14:00:00'),
 ('불고기', '12000', '24000', '2025-01-22 14:00:00'),
 ('불고기', '12000', '24000', '2025-01-22 14:00:00'),
@@ -43,3 +48,17 @@ INSERT INTO orderedMenu (menuName, price, totalPrice, visitTime) VALUES
 ('떡볶이', '4000', '8000', '2025-03-15 13:20:00'),
 ('라면', '3000', '6000', '2025-03-20 20:00:00'),
 ('삼겹살', '13000', '26000', '2025-03-25 16:30:00');
+
+INSERT INTO orderedVisitor (user_id, visitors, isTakeout, visitTime) VALUES
+('user1', 2, TRUE, '2025-01-15 14:30:00'),
+('user2', 4, FALSE, '2025-01-22 18:00:00'),
+('user1', 3, TRUE, '2025-02-10 12:15:00'),
+('user3', 5, FALSE, '2025-02-25 19:45:00'),
+('user2', 2, TRUE, '2025-03-05 16:20:00'),
+('user4', 1, FALSE, '2025-03-12 13:10:00'),
+('user3', 4, TRUE, '2025-01-30 11:50:00'),
+('user5', 3, FALSE, '2025-02-18 17:30:00'),
+('user1', 2, TRUE, '2025-03-28 20:00:00'),
+('user4', 5, FALSE, '2025-01-08 09:45:00'),
+('user10', 5, FALSE, '2025-01-08 09:45:00');
+

@@ -19,7 +19,7 @@ const Customer = (sequelize, DataTypes) => {
         type: DataTypes.STRING(255),
         allowNull: false,
       },
-      userid: {
+      user_id: {
         type: DataTypes.STRING(255),
         allowNull: false,
       },

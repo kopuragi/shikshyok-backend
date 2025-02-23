@@ -17,6 +17,10 @@ const Order = (sequelize, DataTypes) => {
         onDelete: "CASCADE",
         onUpdate: "CASCADE",
       },
+      user_id: {
+        type: DataTypes.STRING(255),
+        allowNull: false,
+      },
       menuName: {
         type: DataTypes.STRING(255),
         allowNull: false,
