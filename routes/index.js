@@ -12,6 +12,13 @@ router.get("/", controller.getIndex);
 // GET /api-server/owner
 router.get("/owner", controller.getOwner);
 
+// POST /api-server/income/orderMenu
+router.post("/income/orderMenu", income.orderMenu);
+// POST /api-server/income/orderVisitor
+router.post("/income/orderVisitor", income.orderVisitor);
+// POST /api-server/income/reVisitor
+router.post("/income/reVisitor", income.reVisitor);
+
 // POST /api-server/income
 router.post("/income", income.income);
 

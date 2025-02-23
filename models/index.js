@@ -29,7 +29,8 @@ const WalletModel = require("./Wallet")(sequelize, Sequelize);
 const ReviewModel = require("./Review")(sequelize, Sequelize);
 const ReviewfileModel = require("./Reviewfile")(sequelize, Sequelize);
 const SalesModel = require("./Sales")(sequelize, Sequelize);
-const OrderedMenu = require("./OrderedMenu")(sequelize, Sequelize);
+
+const OrderedVisitorModel = require("./OrderedVisitor")(sequelize, Sequelize);
 //db 관계 설정
 //메뉴-메뉴 첨부파일
 MenuModel.hasOne(MenufileModel, {
@@ -45,10 +46,14 @@ CustomerModel.hasOne(OrderSummaryModel, {
   foreignKey: "sum_cus_id",
 });
 
+//고객 - 주문
+
+
 //고객-주문
 CustomerModel.hasMany(OrderModel, {
   foreignKey: "cus_order_id",
 });
+
 //리뷰-리뷰 첨부파일
 ReviewModel.hasOne(ReviewfileModel, {
   foreignKey: "review_id",
@@ -93,8 +98,11 @@ ReviewModel.belongsTo(CustomerModel, {
   as: "customer",
 });
 
-OrderModel.hasMany(OrderedMenu);
-OrderedMenu.belongsTo(OrderModel);
+OrderModel.hasMany(OrderedMenuModel);
+OrderedMenuModel.belongsTo(OrderModel);
+OrderModel.hasMany(OrderedVisitorModel);
+OrderedVisitorModel.belongsTo(OrderModel);
+
 //db 객체에 모델 추가
 db.Customer = CustomerModel;
 db.Owner = OwnerModel;
@@ -108,5 +116,6 @@ db.Wallet = WalletModel;
 db.Review = ReviewModel;
 db.Reviewfile = ReviewfileModel;
 db.Sales = SalesModel;
-db.OrderedMenu = OrderedMenu;
+db.OrderedMenu = OrderedMenuModel;
+db.OrderedVisitor = OrderedVisitorModel;
 module.exports = db;
