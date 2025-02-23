@@ -71,8 +71,12 @@ io.on("connection", (socket) => {
     console.log("Customer connected");
     console.log("고객 커넥트 아이디", data.loginId);
     const customerId = data.loginId;
+    console.log("고객 아이디 확인 - ", customerId);
 
-    const customerOrders = orderApproval[customerId] || [];
+    const customerOrders = Object.values(orderApproval)
+      .flat()
+      .filter((order) => order.shopLoginId === customerId);
+
     console.log("고객의 모든 주문 정보 = ", customerOrders);
     socket.emit("customerOrderSync", customerOrders);
     addClient(data);
@@ -82,8 +86,12 @@ io.on("connection", (socket) => {
     console.log("Owner connected");
     console.log("점주 커넥트 아이디=", data);
     const ownerId = data.loginId;
+    console.log("점주 아이디확인-", ownerId);
 
-    const ownerOrders = orderInfo[ownerId] || [];
+    const ownerOrders = Object.values(orderInfo)
+      .flat()
+      .filter((order) => order.shopLoginId === ownerId);
+
     console.log("점주의 모든 주문 정보 = ", ownerOrders);
     socket.emit("ownerOrderSync", ownerOrders);
     addClient(data);
@@ -92,10 +100,12 @@ io.on("connection", (socket) => {
   socket.on("order", (data) => {
     console.log("주문이 들어왔습니다.");
     console.log("요기서 확인=", data);
-    if (!orderInfo[data.loginId]) {
-      orderInfo[data.loginId] = [];
+    const customerId = data.loginId;
+    if (!orderInfo[customerId]) {
+      orderInfo[customerId] = [];
     }
-    orderInfo[data.loginId].push(data);
+    orderInfo[customerId].push(data);
+
     console.log(
       "고객 주문 정보 해시 맵 = ",
       JSON.stringify(orderInfo[data.loginId], null, 2)
@@ -105,10 +115,10 @@ io.on("connection", (socket) => {
     console.log("onwerId = ", ownerId);
     if (connectedClients[ownerId]) {
       connectedClients[ownerId].forEach((clientId) => {
-        io.to(clientId).emit("order", data);
+        io.to(clientId).emit("order", orderInfo[customerId]);
       });
     } else {
-      console.log(`No connected clients for ownerId: ${ownerId}`);
+      console.log(`1.No connected clients for ownerId: ${ownerId}`);
     }
   });
 
@@ -132,30 +142,7 @@ io.on("connection", (socket) => {
         io.to(clientId).emit("orderApproval", orderApproval[customerId]);
       });
     } else {
-      console.log(`No connected clients for customerId: ${customerId}`);
-    }
-  });
-
-  socket.on("orderCustomerSync", (data) => {
-    console.log("주문 동기화 요청이 들어왔습니다 = ", data);
-    const customerId = data.loginId;
-
-    orderApproval[customerId] = data;
-
-    console.log(
-      "주문 승인 정보 해시 맵 = ",
-      JSON.stringify(orderApproval[customerId], null, 2)
-    );
-
-    const customerOrders = orderApproval[customerId] || [];
-    console.log("고객의 모든 주문 정보 = ", customerOrders);
-
-    if (connectedClients[customerId]) {
-      connectedClients[customerId].forEach((clientId) => {
-        io.to(clientId).emit("orderSync", customerOrders);
-      });
-    } else {
-      console.log(`No connected clients for customerId: ${customerId}`);
+      console.log(`2.No connected clients for customerId: ${customerId}`);
     }
   });
 
@@ -169,7 +156,7 @@ io.on("connection", (socket) => {
         io.to(clientId).emit("cookingStart", data);
       });
     } else {
-      console.log(`No connected clients for ownerId: ${ownerId}`);
+      console.log(`4.No connected clients for ownerId: ${ownerId}`);
     }
   });
 
