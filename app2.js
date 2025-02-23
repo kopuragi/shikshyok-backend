@@ -93,10 +93,12 @@ io.on("connection", (socket) => {
     socket.emit("ownerOrderSync", ownerOrders);
     addClient(data);
   });
+
   socket.on("order", (data) => {
     console.log("주문이 들어왔습니다.");
     console.log("요기서 확인=", data);
     const customerId = data.loginId;
+    const ownerId = data.shopLoginId;
     if (!orderInfo[customerId]) {
       orderInfo[customerId] = [];
     }
@@ -107,23 +109,20 @@ io.on("connection", (socket) => {
       JSON.stringify(orderInfo[data.loginId], null, 2)
     );
 
-    const ownerId = data.shopLoginId;
-    console.log("onwerId = ", ownerId);
-    console.log("ddd===", orderInfo[customerId]);
     if (connectedClients[ownerId]) {
       connectedClients[ownerId].forEach((clientId) => {
-        io.to(clientId).emit("order", orderInfo[customerId]);
+        io.to(clientId).emit("order", data);
       });
     } else {
-      console.log(`1.No connected clients for ownerId: ${ownerId}`);
+      console.log(`No connected clients for ownerId: ${ownerId}`);
     }
 
     if (connectedClients[customerId]) {
       connectedClients[customerId].forEach((clientId) => {
-        io.to(clientId).emit("order", orderInfo[customerId]);
+        io.to(clientId).emit("order", data);
       });
     } else {
-      console.log(`3.No connected clients for customerId: ${customerId}`);
+      console.log(`No connected clients for ownerId: ${customerId}`);
     }
   });
 
