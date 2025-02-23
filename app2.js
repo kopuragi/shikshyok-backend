@@ -38,9 +38,6 @@ const connectedClients = {};
 //고객의 주문 정보 저장소
 const orderInfo = {};
 
-//주문 승인 정보 저장소
-const orderApproval = {};
-
 console.log("Connected clients:", JSON.stringify(connectedClients, null, 2));
 sequelize
   .sync({ force: false, alter: false })
@@ -73,9 +70,9 @@ io.on("connection", (socket) => {
     const customerId = data.loginId;
     console.log("고객 아이디 확인 - ", customerId);
 
-    const customerOrders = Object.values(orderApproval)
+    const customerOrders = Object.values(orderInfo)
       .flat()
-      .filter((order) => order.shopLoginId === customerId);
+      .filter((order) => order.loginId === customerId);
 
     console.log("고객의 모든 주문 정보 = ", customerOrders);
     socket.emit("customerOrderSync", customerOrders);
@@ -96,7 +93,6 @@ io.on("connection", (socket) => {
     socket.emit("ownerOrderSync", ownerOrders);
     addClient(data);
   });
-
   socket.on("order", (data) => {
     console.log("주문이 들어왔습니다.");
     console.log("요기서 확인=", data);
@@ -113,6 +109,7 @@ io.on("connection", (socket) => {
 
     const ownerId = data.shopLoginId;
     console.log("onwerId = ", ownerId);
+    console.log("ddd===", orderInfo[customerId]);
     if (connectedClients[ownerId]) {
       connectedClients[ownerId].forEach((clientId) => {
         io.to(clientId).emit("order", orderInfo[customerId]);
@@ -120,26 +117,25 @@ io.on("connection", (socket) => {
     } else {
       console.log(`1.No connected clients for ownerId: ${ownerId}`);
     }
-  });
-
-  socket.on("orderApproval", (data) => {
-    console.log("주문이 승인되었습니다.");
-    console.log("주문 승인 확인=", data);
-    const customerId = data.loginId;
-    console.log("customerId = ", customerId);
-    if (!orderApproval[customerId]) {
-      orderApproval[customerId] = [];
-    }
-    orderApproval[customerId].push(data);
-
-    console.log(
-      "주문 승인 정보 해시 맵 = ",
-      JSON.stringify(orderApproval[customerId], null, 2)
-    );
 
     if (connectedClients[customerId]) {
       connectedClients[customerId].forEach((clientId) => {
-        io.to(clientId).emit("orderApproval", orderApproval[customerId]);
+        io.to(clientId).emit("order", orderInfo[customerId]);
+      });
+    } else {
+      console.log(`3.No connected clients for customerId: ${customerId}`);
+    }
+  });
+
+  socket.on("orderApproval", (data) => {
+    console.log("주문 승인되었습니다.");
+    console.log("주문 승인 확인=", data);
+    const customerId = data.loginId;
+    console.log("customerId = ", customerId);
+
+    if (connectedClients[customerId]) {
+      connectedClients[customerId].forEach((clientId) => {
+        io.to(clientId).emit("orderApproval", data);
       });
     } else {
       console.log(`2.No connected clients for customerId: ${customerId}`);
@@ -147,16 +143,30 @@ io.on("connection", (socket) => {
   });
 
   socket.on("cookingStart", (data) => {
-    console.log("요리가 시작되었습니다.");
+    console.log("조리 시작 되었습니다.");
     console.log("주문 정보 확인 = ", data);
-    const ownerId = data.loginId;
-    console.log("ownerId = ", ownerId);
-    if (connectedClients[ownerId]) {
-      connectedClients[ownerId].forEach((clientId) => {
+    const customerId = data.loginId;
+    console.log("customerId = ", customerId);
+    if (connectedClients[customerId]) {
+      connectedClients[customerId].forEach((clientId) => {
         io.to(clientId).emit("cookingStart", data);
       });
     } else {
-      console.log(`4.No connected clients for ownerId: ${ownerId}`);
+      console.log(`4.No connected clients for ownerId: ${customerId}`);
+    }
+  });
+
+  socket.on("cookingEnd", (data) => {
+    console.log("조리 완료 되었습니다.");
+    console.log("주문 정보 확인 = ", data);
+    const customerId = data.loginId;
+    console.log("customerId = ", customerId);
+    if (connectedClients[customerId]) {
+      connectedClients[customerId].forEach((clientId) => {
+        io.to(clientId).emit("cookingEnd", data);
+      });
+    } else {
+      console.log(`4.No connected clients for ownerId: ${customerId}`);
     }
   });
 
