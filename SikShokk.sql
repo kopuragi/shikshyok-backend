@@ -1,4 +1,5 @@
--- Active: 1732688612707@@127.0.0.1@3306@sesac
+
+-- Active: 1739513174980@@127.0.0.1@3306@kopuragi
 #데이터베이스 생성
 CREATE DATABASE Kopuragi DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
 
@@ -14,7 +15,10 @@ GRANT ALL PRIVILEGES ON *.* TO 'shikshokk'@'%' WITH GRANT OPTION;
 #계정이 제대로 생성되었는지 확인
 SHOW DATABASES;
 USE kopuragi;
-SELECT * FROM kopuragi;
+
+
+
+
 
 #??
 FLUSH PRIVILEGES;
@@ -49,6 +53,7 @@ INSERT INTO orderedMenu (menuName, price, totalPrice, visitTime) VALUES
 ('라면', '3000', '6000', '2025-03-20 20:00:00'),
 ('삼겹살', '13000', '26000', '2025-03-25 16:30:00');
 
+
 INSERT INTO orderedVisitor (user_id, visitors, isTakeout, visitTime) VALUES
 ('user1', 2, TRUE, '2025-01-15 14:30:00'),
 ('user2', 4, FALSE, '2025-01-22 18:00:00'),
@@ -61,4 +66,37 @@ INSERT INTO orderedVisitor (user_id, visitors, isTakeout, visitTime) VALUES
 ('user1', 2, TRUE, '2025-03-28 20:00:00'),
 ('user4', 5, FALSE, '2025-01-08 09:45:00'),
 ('user10', 5, FALSE, '2025-01-08 09:45:00');
+
+
+#owner 샘플 데이터
+SELECT * FROM owner;
+INSERT INTO owner (name, nickname, userid, pw, email, phone, join_date, isDelete, businessNumber, ownerShopname, ownerShopaddress, ownerShoptype) VALUE 
+('임진우','지누','jinu0000','aaAA11!!','jinu@naver.com','010-0000-0000', '2025-01-01', false, '1111111111','스타벅스','서울시 도봉구','카페');
+
+
+#shop 테이블 샘플 데이터
+SELECT * FROM shop;
+INSERT INTO shop (owner_id, shopName, businessNumber, shopAddress, shopPhone, shopType, shopOwner) VALUES 
+(1, '투썸플레이스','1234567890','서울시 도봉구','02-222-2222','카페','이민철');
+
+#menu 테이블 샘플 데이터
+SELECT * FROM menu;
+#menu 테이블의 내용을 전부 지운다.
+TRUNCATE TABLE menu;
+INSERT INTO menu (shop_menu_id, menuName, price, menudesc, category) VALUES 
+(1, '얼그레이',4000,'시트러스 향이 나는 홍차','차');
+INSERT INTO menu (shop_menu_id, menuName, price, menudesc, category) VALUES 
+(2, '페퍼민트',4000,'시트러스 향이 나는 홍차','차');
+INSERT INTO menu (shop_menu_id, menuName, price, menudesc, category) VALUES 
+(3, '아메리카노',4000,'시트러스 향이 나는 홍차','커피');
+INSERT INTO menu (shop_menu_id, menuName, price, menudesc, category) VALUES 
+(4, '카페라떼',4000,'시트러스 향이 나는 홍차','커피');
+INSERT INTO menu (shop_menu_id, menuName, price, menudesc, category) VALUES 
+(5, '마끼아또',4000,'시트러스 향이 나는 홍차','커피');
+INSERT INTO menu (shop_menu_id, menuName, price, menudesc, category) VALUES 
+(6, '오렌지 주스',4000,'시트러스 향이 나는 홍차','주스');
+INSERT INTO menu (shop_menu_id, menuName, price, menudesc, category) VALUES 
+(7, '딸기주스',4000,'시트러스 향이 나는 홍차','주스');
+INSERT INTO menu (shop_menu_id, menuName, price, menudesc, category) VALUES 
+(8, '사과주스',4000,'시트러스 향이 나는 홍차','주스');
 

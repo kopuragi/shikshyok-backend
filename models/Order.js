@@ -7,6 +7,16 @@ const Order = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
+      cus_order_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: "customer",
+          key: "id",
+        },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
+      },
       shop_order_id: {
         type: DataTypes.INTEGER,
         allowNull: false,

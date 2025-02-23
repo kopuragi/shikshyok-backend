@@ -45,7 +45,15 @@ CustomerModel.hasOne(WalletModel, {
 CustomerModel.hasOne(OrderSummaryModel, {
   foreignKey: "sum_cus_id",
 });
+
 //고객 - 주문
+
+
+//고객-주문
+CustomerModel.hasMany(OrderModel, {
+  foreignKey: "cus_order_id",
+});
+
 //리뷰-리뷰 첨부파일
 ReviewModel.hasOne(ReviewfileModel, {
   foreignKey: "review_id",
@@ -83,6 +91,11 @@ ShopModel.hasMany(MenuModel, {
 //고객-리뷰
 CustomerModel.hasMany(ReviewModel, {
   foreignKey: "cus_rev_id",
+});
+// ---- 추가
+ReviewModel.belongsTo(CustomerModel, {
+  foreignKey: "cus_rev_id",
+  as: "customer",
 });
 
 OrderModel.hasMany(OrderedMenuModel);

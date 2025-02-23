@@ -22,18 +22,14 @@ const Menu = (sequelize, DataTypes) => {
         allowNull: false,
       },
       price: {
-        type: DataTypes.STRING(255),
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
-      desc: {
+      menudesc: {
         type: DataTypes.STRING(255),
         allowNull: false,
       },
       category: {
-        type: DataTypes.STRING(255),
-        allowNull: false,
-      },
-      menuTab: {
         type: DataTypes.STRING(255),
         allowNull: false,
       },
