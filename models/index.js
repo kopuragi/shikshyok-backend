@@ -21,7 +21,7 @@ const CustomerModel = require("./Customer")(sequelize, Sequelize);
 const OwnerModel = require("./Owner")(sequelize, Sequelize);
 const ShopModel = require("./Shop")(sequelize, Sequelize);
 const MenuModel = require("./Menu")(sequelize, Sequelize);
-const MenufileModel = require("./Menufile")(sequelize, Sequelize);
+// const MenufileModel = require("./Menufile")(sequelize, Sequelize);
 const OrderModel = require("./Order")(sequelize, Sequelize);
 const OrderedMenuModel = require("./OrderedMenu")(sequelize, Sequelize);
 const OrderSummaryModel = require("./OrderSummary")(sequelize, Sequelize);
@@ -33,9 +33,9 @@ const SalesModel = require("./Sales")(sequelize, Sequelize);
 const OrderedVisitorModel = require("./OrderedVisitor")(sequelize, Sequelize);
 //db 관계 설정
 //메뉴-메뉴 첨부파일
-MenuModel.hasOne(MenufileModel, {
-  foreignKey: "menu_id",
-});
+// MenuModel.hasOne(MenufileModel, {
+//   foreignKey: "menu_id",
+// });
 
 //고객-지갑
 CustomerModel.hasOne(WalletModel, {
@@ -47,7 +47,6 @@ CustomerModel.hasOne(OrderSummaryModel, {
 });
 
 //고객 - 주문
-
 
 //고객-주문
 CustomerModel.hasMany(OrderModel, {
@@ -108,7 +107,7 @@ db.Customer = CustomerModel;
 db.Owner = OwnerModel;
 db.Shop = ShopModel;
 db.Menu = MenuModel;
-db.Menufile = MenufileModel;
+// db.Menufile = MenufileModel;
 db.Order = OrderModel;
 db.OrderedMenu = OrderedMenuModel;
 db.OrderSummaryMenu = OrderSummaryModel;

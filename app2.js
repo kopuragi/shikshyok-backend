@@ -18,6 +18,9 @@ const io = socketIo(server, {
     methods: ["GET", "POST"],
   },
 });
+// const AWS = require("aws-sdk");
+// const multer = require("multer");
+// const s3 = new AWS.S3();
 
 const PORT = 8082;
 const { sequelize } = require("./models");
@@ -51,7 +54,7 @@ const orderApprovedStorage = {
 
 console.log("Connected clients:", JSON.stringify(connectedClients, null, 2));
 sequelize
-  .sync({ force: false, alter: false })
+  .sync({ force: true })
   .then(() => {
     server.listen(PORT, () => {
       console.log(`http://localhost:${PORT}`);
