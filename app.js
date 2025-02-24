@@ -63,6 +63,23 @@ const orderApprovedStorage = {
   },
 };
 
+//주문확인, 조리시작, 조리완료 상태관리 버튼
+const orderStatusCustomerStorage = {
+  onwer: {
+    "주문번호가 키임": "12345678-5be4-4fcf-9e9b-d164a3a0ff2d",
+  },
+};
+const cookingCompletedCustomerStorage = {
+  onwer: {
+    "주문번호가 키임": "12345678-5be4-4fcf-9e9b-d164a3a0ff2d",
+  },
+};
+const orderApprovedCustomerStorage = {
+  onwer: {
+    "주문번호가 키임": "12345678-5be4-4fcf-9e9b-d164a3a0ff2d",
+  },
+};
+
 console.log("Connected clients:", JSON.stringify(connectedClients, null, 2));
 sequelize
   .sync({ force: false, alter: false })
@@ -89,19 +106,41 @@ io.on("connection", (socket) => {
     console.log("클라이언트 해시 맵 == ", connectedClients);
   };
 
-  socket.on("connectCustomer", (data) => {
-    console.log("Customer connected");
-    console.log("고객 커넥트 아이디", data.loginId);
-    const customerId = data.loginId;
-    console.log("고객 아이디 확인 - ", customerId);
+  socket.on(
+    "connectCustomer",
+    (data, orderStatus, cookingCompleted, orderApproved) => {
+      console.log("Customer connected");
+      console.log("orderStatus = ", orderStatus);
+      console.log("cookingCompleted = ", cookingCompleted);
+      console.log("orderApproved = ", orderApproved);
 
-    const customerOrders = Object.values(orderInfo)
-      .flat()
-      .filter((order) => order.loginId === customerId);
+      console.log("고객 커넥트 아이디", data.loginId);
+      const customerId = data.loginId;
+      console.log("고객 아이디 확인 - ", customerId);
 
-    socket.emit("customerOrderSync", customerOrders);
-    addClient(data);
-  });
+      const customerOrders = Object.values(orderInfo)
+        .flat()
+        .filter((order) => order.loginId === customerId);
+
+      console.log("고객의 모든 주문 정보 = ", customerOrders);
+      const reverseOwnerOrders = customerOrders.slice().reverse();
+      const customerApprovedOrders =
+        orderApprovedCustomerStorage[customerId] || {};
+      const customerCookingStatus =
+        orderStatusCustomerStorage[customerId] || {};
+      const customerCookingCompleted =
+        cookingCompletedCustomerStorage[customerId] || {};
+
+      socket.emit(
+        "customerOrderSync",
+        reverseOwnerOrders,
+        customerApprovedOrders,
+        customerCookingStatus,
+        customerCookingCompleted
+      );
+      addClient(data);
+    }
+  );
 
   socket.on(
     "connectOwner",
@@ -223,38 +262,57 @@ io.on("connection", (socket) => {
    */
 
   //점주가 주문 확인 버튼 눌렀을 떄떄
-  socket.on("setOrderApproved", (data, shopLoginId) => {
+  socket.on("setOrderApproved", (data, shopLoginId, loginId) => {
     console.log("주문확인버튼 상태 받음 = ", data);
     orderApprovedStorage[shopLoginId] = data;
+    orderApprovedCustomerStorage[loginId] = data;
 
     connectedClients[shopLoginId].forEach((clientId) => {
       io.to(clientId).emit("setOrderApprovedTo", data);
     });
+    connectedClients[loginId].forEach((clientId) => {
+      io.to(clientId).emit("setOrderApprovedTo", data);
+    });
+
+    console.log("고객 주문확인 상태 해쉬 맵 = ", orderApprovedCustomerStorage);
 
     console.log("shopLoginId = ", shopLoginId);
     console.log("주문확인 상태 해쉬 맵 = ", orderApprovedStorage);
   });
 
-  socket.on("setOrderStatus", (data, shopLoginId) => {
+  socket.on("setOrderStatus", (data, shopLoginId, loginId) => {
     console.log("조리시작버튼 상태 받음 = ", data);
     orderStatusStorage[shopLoginId] = data;
+    orderStatusCustomerStorage[loginId] = data;
 
     connectedClients[shopLoginId].forEach((clientId) => {
       io.to(clientId).emit("setOrderStatusTo", data);
     });
+    connectedClients[loginId].forEach((clientId) => {
+      io.to(clientId).emit("setOrderStatusTo", data);
+    });
 
+    console.log("고객 조리시작 상태 해쉬 맵 = ", orderStatusCustomerStorage);
     console.log("shopLoginId = ", shopLoginId);
     console.log("조리시작 상태 해쉬 맵 = ", orderStatusStorage);
   });
 
-  socket.on("setCookingCompleted", (data, shopLoginId) => {
+  socket.on("setCookingCompleted", (data, shopLoginId, loginId) => {
     console.log("조리완료버튼 상태 받음 = ", data);
     cookingCompletedStorage[shopLoginId] = data;
+    cookingCompletedCustomerStorage[loginId] = data;
 
     connectedClients[shopLoginId].forEach((clientId) => {
       io.to(clientId).emit("setCookingCompletedTo", data);
     });
+    connectedClients[loginId].forEach((clientId) => {
+      io.to(clientId).emit("setCookingCompletedTo", data);
+    });
 
+    console.log(
+      "고객 조리완료 상태 해쉬 맵 = ",
+      cookingCompletedCustomerStorage
+    );
     console.log("shopLoginId = ", shopLoginId);
     console.log("조리완료 상태 해쉬 맵 = ", cookingCompletedStorage);
   });
