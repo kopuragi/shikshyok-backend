@@ -1,64 +1,46 @@
-const express = require('express');
-const router = express.Router();
-const controller = require('../controller/Cmain');
-const income = require('../controller/Income');
-const review = require('../controller/Review');
-const menu = require('../controller/Cmenu');
-const userController = require('../controller/UserController');
-
-// GET /api-server
-router.get('/', controller.getIndex);
-
-// GET /api-server/owner
-router.get('/owner', controller.getOwner);
-
-// POST /api-server/income/orderMenu
-router.post('/income/orderMenu', income.orderMenu);
-// POST /api-server/income/orderVisitor
-router.post('/income/orderVisitor', income.orderVisitor);
-// POST /api-server/income/reVisitor
-router.post('/income/reVisitor', income.reVisitor);
-
-// GET /api-server/owner-review
-router.get('/owner-review', review.getOwnerReview);
-
-// PATCH /api-server/owner-review/:id
-router.patch('/owner-review/:id', review.updateOwnerReview);
-
-// PATCH /api-server/owner-review (고객리뷰 삭제요청)
-router.patch('/owner-review', review.CusReviewDelete);
-
-// DELETE /api-server/owner-review/:id
-router.delete('/owner-review/:id', review.deleteOwnerReview);
-
-// GET /api-server/menu-list
-router.get('/menu-list', menu.getMenus);
-
-// POST /api-server/menu-register
-router.post('/menu-register', menu.createMenus);
-
-//POST /api-server/upload
-// router.post("/upload", menu.upload.single("image"), menu.fileupload);
-
-// PATCH /api-server/menu-change
-router.patch('/menu-change', menu.updateMenus);
-
-// 회원가입 POST /api-server/signup
-router.post('/signup', userController.signUp);
-
-// 로그인 POST /api-server/login
-router.post('/login', userController.login);
-
-// 로그아웃 POST /api-server/logout
-router.post('/logout', userController.logout);
-
-// 로그인한 사용자 정보 가져오기 GET /api-server/me
-router.get('/me', userController.getUserProfile);
-
-// 사용자 탈퇴 DELETE /api-server/delete/:username/:membershipType
-router.delete('/delete/:username/:membershipType', userController.deleteUser);
-
-// 사용자 프로필 수정 (통합된 메서드로 변경) PUT /api-server/update
-router.put('/update', userController.updateUserProfile);
-
-module.exports = router;
+import { useRoutes } from "react-router-dom";
+import Home from "../pages/Home/Home";
+import OwnerOrderAllHistory from "../pages/Order/OwnerOrderPage/OwnerOrderAllHistory";
+import OwnerOrderHistory from "../pages/Order/OwnerOrderPage/OwnerOrderHistory";
+import OnwerOrderHistory2 from "../pages/Order/OwnerOrderPage/OwnerOrderHistory2";
+import Menus from "../pages/Menus";
+import OwnerMain from "../pages/OwnerMain";
+import OwnerReview from "../pages/OwnerReview";
+import CounterTest from "../pages/CounterTest";
+import OrderTest from "../pages/Order/OwnerOrderPage/OrderTest";
+import OrderTest2 from "../pages/Order/OwnerOrderPage/OrderTest2";
+import CustomerShopDetail from "../pages/CustomerShopDetail";
+import ShoppingCart from "../components/ShoppingCart";
+import CusReview from "../pages/CusReview";
+import EditProfilePage from "../pages/SignUp/EditProfilePage";
+import LoginPage from "../pages/SignUp/LoginPage";
+import SignUpPage from "../pages/SignUp/SignUpPage";
+import MyPage from "../pages/SignUp/MyPage";
+import UserMain from "../pages/UserMain";
+//@ts-ignore
+import Income from "../pages/Income/Income";
+const AppRoutes = () => {
+  let routes = useRoutes([
+    { path: "/Home", element: <Home /> },
+    { path: "/order1", element: <OwnerOrderHistory /> },
+    { path: "/order2", element: <OnwerOrderHistory2 /> },
+    { path: "/menu", element: <Menus /> },
+    { path: "/OwnerOrderHistory", element: <OwnerOrderHistory /> },
+    { path: "/", element: <OwnerMain /> },
+    { path: "/owner-review", element: <OwnerReview /> },
+    { path: "/counter", element: <CounterTest /> },
+    { path: "/income", element: <Income /> },
+    { path: "/testorder", element: <OrderTest /> },
+    { path: "/testorder2", element: <OrderTest2 /> },
+    { path: "/shopdetail", element: <CustomerShopDetail /> },
+    { path: "/cart", element: <ShoppingCart /> },
+    { path: "/review", element: <CusReview /> },
+    { path: "/edit-profile", element: <EditProfilePage /> },
+    { path: "/login", element: <LoginPage /> },
+    { path: "/signup", element: <SignUpPage /> },
+    { path: "/mypage", element: <MyPage /> },
+    { path: "/UserMain", element: <UserMain /> },
+  ]);
+  return routes;
+};
+export default AppRoutes;
