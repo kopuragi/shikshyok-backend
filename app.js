@@ -1,12 +1,22 @@
 const express = require("express");
 const app = express();
 const PORT = 8082;
+const socketIo = require("socket.io");
+const http = require("http");
 const { sequelize } = require("./models");
 const indexRouter = require("./routes");
 const serverPerfix = "/api-server";
 const cors = require("cors");
 const session = require("express-session");
 const dotenv = require("dotenv");
+
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
 
 dotenv.config();
 
