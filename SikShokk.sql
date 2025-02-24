@@ -81,6 +81,9 @@ INSERT INTO shop (owner_id, shopName, businessNumber, shopAddress, shopPhone, sh
 
 #menu 테이블 샘플 데이터
 SELECT * FROM menu;
+DROP TABLE menu;
+DROP TABLE menufile;
+DESC menu;
 #menu 테이블의 내용을 전부 지운다.
 TRUNCATE TABLE menu;
 INSERT INTO menu (shop_menu_id, menuName, price, menudesc, category) VALUES 
