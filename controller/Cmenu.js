@@ -32,7 +32,11 @@ exports.createMenus = async (req, res) => {
     menudesc: req.body.mdesc,
     category: req.body.mcategory,
   });
-  //   const insertMenufile = await Menufile.create({});
+  //첨부 파일 추가 controller
+  //   const insertMenufile = await Menufile.create({
+  // originMfile: req.body.mfile,
+  // saveMfile: req.body.mfile,//일단 이렇게 써놨지만, 확장자를 제거하고 넣어야 한다.
+  // });
   console.log(insertMenus);
   res.send({ insertMenus });
 };
@@ -50,15 +54,35 @@ exports.updateMenus = async (req, res) => {
   // console.log(findShopId);
 
   // const { shopid } = findShopId.data;
+  try {
+    const chgMenus = await Menu.update(
+      {
+        menuName: req.body.chgname,
+        price: Number(req.body.chgprice),
+        menudesc: req.body.chgdesc,
+        category: req.body.chgcategory,
+      },
+      {
+        where: {
+          id: req.body.id,
+        },
+      }
+    );
 
-  const insertMenus = await Menu.create({
-    shop_menu_id: 2,
-    menuName: req.body.mname,
-    price: Number(req.body.mprice),
-    menudesc: req.body.mdesc,
-    category: req.body.mcategory,
-  });
-  //   const insertMenufile = await Menufile.create({});
-  console.log(insertMenus);
-  res.send({ insertMenus });
+    //파일 수정 controller
+    /* const chgMenufiles = await Menufiles.update(
+    {
+    originMfile: req.body.chgfile,
+    saveMfile: req.body.chgfile,
+    },
+    {
+    where:{
+    id:req.body.id
+    }
+    }
+    ) */
+    res.send({ chgMenus });
+  } catch (err) {
+    console.log("err", err);
+  }
 };
