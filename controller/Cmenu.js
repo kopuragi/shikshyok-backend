@@ -1,3 +1,4 @@
+const path = require("path");
 const { Menu, Menufile, Shop } = require("../models");
 
 exports.getMenus = async (req, res) => {
@@ -31,11 +32,13 @@ exports.createMenus = async (req, res) => {
     price: Number(req.body.mprice),
     menudesc: req.body.mdesc,
     category: req.body.mcategory,
+    originMfile: req.body.mfile,
+    saveMfile: path.basename(req.body.mfile, path.extname(req.body.mfile)),
   });
   //첨부 파일 추가 controller
   //   const insertMenufile = await Menufile.create({
   // originMfile: req.body.mfile,
-  // saveMfile: req.body.mfile,//일단 이렇게 써놨지만, 확장자를 제거하고 넣어야 한다.
+  // saveMfile: path.basename(req.body.mfile , path.extname(req.body.mfile)),//일단 이렇게 써놨지만, 확장자를 제거하고 넣어야 한다.
   // });
   console.log(insertMenus);
   res.send({ insertMenus });
@@ -61,6 +64,11 @@ exports.updateMenus = async (req, res) => {
         price: Number(req.body.chgprice),
         menudesc: req.body.chgdesc,
         category: req.body.chgcategory,
+        originMfile: req.body.chgfile,
+        saveMfile: path.basename(
+          req.body.chgfile,
+          path.extname(req.body.chgfile)
+        ),
       },
       {
         where: {
@@ -73,7 +81,7 @@ exports.updateMenus = async (req, res) => {
     /* const chgMenufiles = await Menufiles.update(
     {
     originMfile: req.body.chgfile,
-    saveMfile: req.body.chgfile,
+    saveMfile: path.basename(req.body.chgfile , path.extname(req.body.chgfile)),
     },
     {
     where:{

@@ -33,6 +33,14 @@ const Menu = (sequelize, DataTypes) => {
         type: DataTypes.STRING(255),
         allowNull: false,
       },
+      originMfile: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
+      saveMfile: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
     },
     { timestamps: false, freezeTableName: true }
   );
