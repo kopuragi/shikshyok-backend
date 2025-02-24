@@ -38,6 +38,17 @@ const connectedClients = {};
 //고객의 주문 정보 저장소
 const orderInfo = {};
 
+//주문확인, 조리시작, 조리완료 상태관리 버튼
+const orderStatusStorage = {
+  "주문번호가 키임": "200f4d28-5be4-4fcf-9e9b-d164a3a0ff2d",
+};
+const cookingCompletedStorage = {
+  "주문번호가 키임": "200f4d28-5be4-4fcf-9e9b-d164a3a0ff2d",
+};
+const orderApprovedStorage = {
+  "주문번호가 키임": "200f4d28-5be4-4fcf-9e9b-d164a3a0ff2d",
+};
+
 console.log("Connected clients:", JSON.stringify(connectedClients, null, 2));
 sequelize
   .sync({ force: false, alter: false })
@@ -79,20 +90,45 @@ io.on("connection", (socket) => {
     addClient(data);
   });
 
-  socket.on("connectOwner", (data) => {
-    console.log("Owner connected");
-    console.log("점주 커넥트 아이디=", data);
-    const ownerId = data.loginId;
-    console.log("점주 아이디확인-", ownerId);
+  socket.on(
+    "connectOwner",
+    (data, orderStatus, cookingCompleted, orderApproved) => {
+      console.log("orderStatus = ", orderStatus);
+      console.log("cookingCompleted = ", cookingCompleted);
+      console.log("orderApproved = ", orderApproved);
 
-    const ownerOrders = Object.values(orderInfo)
-      .flat()
-      .filter((order) => order.shopLoginId === ownerId);
+      if (!orderStatusStorage[orderStatus]) {
+        orderStatusStorage[orderStatus] = {};
+      }
+      orderStatusStorage[orderStatus] = orderStatus;
+      console.log("Updated orderStatus:", orderStatus);
 
-    console.log("점주의 모든 주문 정보 = ", ownerOrders);
-    socket.emit("ownerOrderSync", ownerOrders);
-    addClient(data);
-  });
+      if (!cookingCompletedStorage[cookingCompleted]) {
+        cookingCompletedStorage[cookingCompleted] = {};
+      }
+      cookingCompletedStorage[cookingCompleted] = cookingCompleted;
+      console.log("Updated cookingCompleted:", cookingCompleted);
+
+      if (!orderApprovedStorage[orderApproved]) {
+        orderApprovedStorage[orderApproved] = {};
+      }
+      orderApprovedStorage[orderApproved] = orderApproved;
+      console.log("Updated orderApproved:", orderApproved);
+
+      console.log("Owner connected");
+      console.log("점주 커넥트 아이디=", data);
+      const ownerId = data.loginId;
+      console.log("점주 아이디확인-", ownerId);
+
+      const ownerOrders = Object.values(orderInfo)
+        .flat()
+        .filter((order) => order.shopLoginId === ownerId);
+
+      console.log("점주의 모든 주문 정보 = ", ownerOrders);
+      socket.emit("ownerOrderSync", ownerOrders);
+      addClient(data);
+    }
+  );
 
   socket.on("order", (data) => {
     console.log("주문이 들어왔습니다.");
@@ -169,6 +205,51 @@ io.on("connection", (socket) => {
     }
   });
 
+  /**
+   *
+   *
+   *const orderStatusStorage = {};
+const cookingCompletedStorage = {};
+const orderApprovedStorage = {};
+   *조리확인, 조리시작, 조리완료 상태관리 소켓
+   */
+
+  //점주가 주문 확인 버튼 눌렀을 떄떄
+  socket.on("setOrderApproved", (data, shopLoginId) => {
+    console.log("주문확인버튼 상태 받음 = ", data);
+
+    // 데이터를 순회하면서 키와 값을 해시 맵에 저장
+    Object.keys(data).forEach((key) => {
+      orderApprovedStorage[key] = data[key];
+    });
+
+    console.log("shopLoginId = ", shopLoginId);
+    console.log("주문확인 상태 해쉬 맵 = ", orderApprovedStorage);
+  });
+
+  socket.on("setOrderStatus", (data, shopLoginId) => {
+    console.log("조리시작버튼 상태 받음 = ", data);
+
+    // 데이터를 순회하면서 키와 값을 해시 맵에 저장
+    Object.keys(data).forEach((key) => {
+      orderStatusStorage[key] = data[key];
+    });
+
+    console.log("shopLoginId = ", shopLoginId);
+    console.log("조리시작 상태 해쉬 맵 = ", orderStatusStorage);
+  });
+
+  socket.on("setCookingCompleted", (data, shopLoginId) => {
+    console.log("조리완료버튼 상태 받음 = ", data);
+
+    // 데이터를 순회하면서 키와 값을 해시 맵에 저장
+    Object.keys(data).forEach((key) => {
+      cookingCompletedStorage[key] = data[key];
+    });
+
+    console.log("shopLoginId = ", shopLoginId);
+    console.log("조리완료 상태 해쉬 맵 = ", cookingCompletedStorage);
+  });
   socket.on("disconnect", () => {
     console.log("클라이언트 접속 해제", socket.id);
 
