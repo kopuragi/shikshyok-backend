@@ -19,9 +19,6 @@ router.post("/income/orderVisitor", income.orderVisitor);
 // POST /api-server/income/reVisitor
 router.post("/income/reVisitor", income.reVisitor);
 
-// POST /api-server/income
-router.post("/income", income.income);
-
 // GET /api-server/owner-review
 router.get("/owner-review", review.getOwnerReview);
 
