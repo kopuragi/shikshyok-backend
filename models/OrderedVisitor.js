@@ -15,7 +15,7 @@ const OrderedVisitor = (sequelize, DataTypes) => {
         allowNull: true,
       },
       visitTime: {
-        type: DataTypes.DATE,
+        type: DataTypes.DATEONLY,
         allowNull: true,
       },
     },
