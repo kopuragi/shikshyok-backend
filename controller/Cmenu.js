@@ -32,13 +32,23 @@ exports.createMenus = async (req, res) => {
       category: req.body.mcategory,
       originMfile: req.body.mfile,
     });
+    const imgUrl = req.file.location;
+
+    console.log(req.file); //파일이 제대로 들어오고 있나
 
     console.log(insertMenus);
-    res.send({ insertMenus });
+    res.send({ insertMenus, imgUrl });
   } catch (err) {
     console.log("err!:", err);
   }
 };
+
+//s3에 이미지 업로드
+// exports.fileupload = async (req, res) => {
+//   console.log("여기는 fileupload");
+//   console.log(req.file.location);
+//   res.send({ imgUrl });
+// };
 
 //메뉴 정보 수정
 exports.updateMenus = async (req, res) => {
@@ -70,7 +80,11 @@ exports.updateMenus = async (req, res) => {
       }
     );
 
-    res.send({ chgMenus });
+    const imgUrl = req.file.location;
+
+    console.log(req.file); //파일이 제대로 들어오고 있나
+
+    res.send({ chgMenus, imgUrl });
   } catch (err) {
     console.log("err", err);
   }
