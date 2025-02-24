@@ -37,6 +37,9 @@ router.get('/menu-list', menu.getMenus);
 // POST /api-server/menu-register
 router.post('/menu-register', menu.createMenus);
 
+//POST /api-server/upload
+// router.post("/upload", menu.upload.single("image"), menu.fileupload);
+
 // PATCH /api-server/menu-change
 router.patch('/menu-change', menu.updateMenus);
 
