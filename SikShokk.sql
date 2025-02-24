@@ -57,6 +57,7 @@ INSERT INTO orderedMenu (menuName, price, totalPrice, visitTime) VALUES
 
 INSERT INTO orderedVisitor (user_id, visitors, isTakeout, visitTime) VALUES
 ('user1', 2, TRUE, '2025-01-25'),
+('user1', 2, TRUE, '2025-01-25'),
 ('user1', 2, TRUE, '2025-01-26'),
 ('user1', 2, TRUE, '2025-01-27'),
 ('user2', 4, FALSE, '2025-01-25'),
@@ -94,6 +95,8 @@ DROP TABLE menufile;
 DESC menu;
 #menu 테이블의 내용을 전부 지운다.
 TRUNCATE TABLE menu;
+
+DROP TABLE menufile;
 INSERT INTO menu (shop_menu_id, menuName, price, menudesc, category) VALUES 
 (1, '얼그레이',4000,'시트러스 향이 나는 홍차','차');
 INSERT INTO menu (shop_menu_id, menuName, price, menudesc, category) VALUES 
