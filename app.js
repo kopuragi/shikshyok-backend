@@ -48,13 +48,19 @@ const orderInfo = {};
 
 //주문확인, 조리시작, 조리완료 상태관리 버튼
 const orderStatusStorage = {
-  "주문번호가 키임": "200f4d28-5be4-4fcf-9e9b-d164a3a0ff2d",
+  onwer: {
+    "주문번호가 키임": "200f4d28-5be4-4fcf-9e9b-d164a3a0ff2d",
+  },
 };
 const cookingCompletedStorage = {
-  "주문번호가 키임": "200f4d28-5be4-4fcf-9e9b-d164a3a0ff2d",
+  onwer: {
+    "주문번호가 키임": "200f4d28-5be4-4fcf-9e9b-d164a3a0ff2d",
+  },
 };
 const orderApprovedStorage = {
-  "주문번호가 키임": "200f4d28-5be4-4fcf-9e9b-d164a3a0ff2d",
+  onwer: {
+    "주문번호가 키임": "200f4d28-5be4-4fcf-9e9b-d164a3a0ff2d",
+  },
 };
 
 console.log("Connected clients:", JSON.stringify(connectedClients, null, 2));
@@ -93,7 +99,6 @@ io.on("connection", (socket) => {
       .flat()
       .filter((order) => order.loginId === customerId);
 
-    console.log("고객의 모든 주문 정보 = ", customerOrders);
     socket.emit("customerOrderSync", customerOrders);
     addClient(data);
   });
@@ -105,24 +110,6 @@ io.on("connection", (socket) => {
       console.log("cookingCompleted = ", cookingCompleted);
       console.log("orderApproved = ", orderApproved);
 
-      if (!orderStatusStorage[orderStatus]) {
-        orderStatusStorage[orderStatus] = {};
-      }
-      orderStatusStorage[orderStatus] = orderStatus;
-      console.log("Updated orderStatus:", orderStatus);
-
-      if (!cookingCompletedStorage[cookingCompleted]) {
-        cookingCompletedStorage[cookingCompleted] = {};
-      }
-      cookingCompletedStorage[cookingCompleted] = cookingCompleted;
-      console.log("Updated cookingCompleted:", cookingCompleted);
-
-      if (!orderApprovedStorage[orderApproved]) {
-        orderApprovedStorage[orderApproved] = {};
-      }
-      orderApprovedStorage[orderApproved] = orderApproved;
-      console.log("Updated orderApproved:", orderApproved);
-
       console.log("Owner connected");
       console.log("점주 커넥트 아이디=", data);
       const ownerId = data.loginId;
@@ -133,7 +120,23 @@ io.on("connection", (socket) => {
         .filter((order) => order.shopLoginId === ownerId);
 
       console.log("점주의 모든 주문 정보 = ", ownerOrders);
-      socket.emit("ownerOrderSync", ownerOrders);
+
+      const reverseOwnerOrders = ownerOrders.slice().reverse();
+      const ownerApprovedOrders = orderApprovedStorage[ownerId] || {};
+      const ownerCookingStatus = orderStatusStorage[ownerId] || {};
+      const ownerCookingCompleted = cookingCompletedStorage[ownerId] || {};
+
+      console.log("버튼 상태 orderApprovedOrders = ", ownerApprovedOrders);
+      console.log("버튼 상태 ownerCookingStatus = ", ownerCookingStatus);
+      console.log("버튼 상태 ownerCookingCompleted = ", ownerCookingCompleted);
+
+      socket.emit(
+        "ownerOrderSync",
+        reverseOwnerOrders,
+        ownerApprovedOrders,
+        ownerCookingStatus,
+        ownerCookingCompleted
+      );
       addClient(data);
     }
   );
@@ -216,19 +219,16 @@ io.on("connection", (socket) => {
   /**
    *
    *
-   *const orderStatusStorage = {};
-const cookingCompletedStorage = {};
-const orderApprovedStorage = {};
    *조리확인, 조리시작, 조리완료 상태관리 소켓
    */
 
   //점주가 주문 확인 버튼 눌렀을 떄떄
   socket.on("setOrderApproved", (data, shopLoginId) => {
     console.log("주문확인버튼 상태 받음 = ", data);
+    orderApprovedStorage[shopLoginId] = data;
 
-    // 데이터를 순회하면서 키와 값을 해시 맵에 저장
-    Object.keys(data).forEach((key) => {
-      orderApprovedStorage[key] = data[key];
+    connectedClients[shopLoginId].forEach((clientId) => {
+      io.to(clientId).emit("setOrderApprovedTo", data);
     });
 
     console.log("shopLoginId = ", shopLoginId);
@@ -237,10 +237,10 @@ const orderApprovedStorage = {};
 
   socket.on("setOrderStatus", (data, shopLoginId) => {
     console.log("조리시작버튼 상태 받음 = ", data);
+    orderStatusStorage[shopLoginId] = data;
 
-    // 데이터를 순회하면서 키와 값을 해시 맵에 저장
-    Object.keys(data).forEach((key) => {
-      orderStatusStorage[key] = data[key];
+    connectedClients[shopLoginId].forEach((clientId) => {
+      io.to(clientId).emit("setOrderStatusTo", data);
     });
 
     console.log("shopLoginId = ", shopLoginId);
@@ -249,10 +249,10 @@ const orderApprovedStorage = {};
 
   socket.on("setCookingCompleted", (data, shopLoginId) => {
     console.log("조리완료버튼 상태 받음 = ", data);
+    cookingCompletedStorage[shopLoginId] = data;
 
-    // 데이터를 순회하면서 키와 값을 해시 맵에 저장
-    Object.keys(data).forEach((key) => {
-      cookingCompletedStorage[key] = data[key];
+    connectedClients[shopLoginId].forEach((clientId) => {
+      io.to(clientId).emit("setCookingCompletedTo", data);
     });
 
     console.log("shopLoginId = ", shopLoginId);
