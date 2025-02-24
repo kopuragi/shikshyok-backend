@@ -31,7 +31,7 @@ app.use(cors());
 app.use(serverPerfix, indexRouter);
 
 sequelize
-  .sync({ force: false, alter: false })
+  .sync({ force: true, alter: true })
   .then(() => {
     app.listen(PORT, () => {
       console.log(`http://localhost:${PORT}`);
