@@ -12,25 +12,23 @@ exports.signUp = async (req, res) => {
     gender,
     email,
     phoneNumber,
-    address,
     companyName,
+    businessRegistrationNumber,
     businessType,
     storeAddress,
     representativeName,
-    businessRegistrationNumber,
     membershipType,
   } = req.body;
 
   try {
     let newUser;
 
-    // 회원 유형에 따라 콘솔에 출력
     console.log(`회원가입 요청: ${membershipType} 회원`);
 
     // 일반회원 가입
     if (membershipType === 'individual') {
       const existingUser = await Customer.findOne({
-        where: { userid: username },
+        where: { nickname: username },
       });
       if (existingUser) {
         return res
@@ -50,20 +48,19 @@ exports.signUp = async (req, res) => {
         name,
         nickname: username,
         gender,
-        userid: username,
+        user_id: username, // user_id는 nickname 사용
         pw: hashedPassword,
         email,
         phone: phoneNumber,
-        address,
         join_date: new Date().toISOString(),
         isDelete: 'N',
-        membershipType: membershipType,
+        membershipType,
       });
 
       // 점주회원 가입
     } else if (membershipType === 'business') {
       const existingOwner = await Owner.findOne({
-        where: { userid: username },
+        where: { userid: username }, // userid로 중복 확인
       });
       if (existingOwner) {
         return res
@@ -81,19 +78,19 @@ exports.signUp = async (req, res) => {
       const hashedPassword = await bcrypt.hash(password, 10);
       newUser = await Owner.create({
         name,
-        userid: username,
-        nickname: username,
+        nickname: username, // nickname 사용
+        userid: username, // userid로 설정
         pw: hashedPassword,
         email,
         phone: phoneNumber,
         businessNumber: businessRegistrationNumber,
-        shop_name: companyName,
-        shop_address: storeAddress,
-        shop_type: businessType,
+        ownerShopname: companyName,
+        ownerShopaddress: storeAddress,
+        ownerShoptype: businessType,
         representativeName,
         join_date: new Date().toISOString(),
         isDelete: 'N',
-        membershipType: membershipType,
+        membershipType,
       });
     } else {
       return res
@@ -115,12 +112,8 @@ exports.login = async (req, res) => {
   const { userid, password } = req.body;
 
   try {
-    let user;
-
-    // 일반회원 로그인
-    user = await Customer.findOne({ where: { userid } });
+    let user = await Customer.findOne({ where: { user_id: userid } });
     if (!user) {
-      // 점주회원 로그인
       user = await Owner.findOne({ where: { userid } });
       if (!user) {
         return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
@@ -134,9 +127,10 @@ exports.login = async (req, res) => {
 
     req.session.user = {
       id: user.id,
-      userid: user.userid,
+      userid: user.userid || user.user_id,
       membershipType: user.membershipType,
-    }; // membershipType 추가
+    };
+
     return res
       .status(200)
       .json({ message: '로그인 성공', membershipType: user.membershipType });
@@ -146,12 +140,13 @@ exports.login = async (req, res) => {
   }
 };
 
-// 사용자 프로필 업데이트 (통합)
+// 사용자 프로필 업데이트
 exports.updateUserProfile = async (req, res) => {
   const {
     nickname,
     email,
     password,
+    newPassword,
     name,
     gender,
     phoneNumber,
@@ -167,7 +162,6 @@ exports.updateUserProfile = async (req, res) => {
   try {
     let user;
 
-    // 회원 유형에 따라 사용자 조회
     if (membershipType === 'individual') {
       user = await Customer.findOne({ where: { nickname } });
     } else if (membershipType === 'business') {
@@ -183,50 +177,34 @@ exports.updateUserProfile = async (req, res) => {
     }
 
     // 이메일 업데이트
-    if (email) {
-      user.email = email;
-    }
+    if (email) user.email = email;
 
     // 비밀번호 업데이트
-    if (password) {
-      user.pw = await bcrypt.hash(password, 10);
+    if (password && newPassword) {
+      const isMatch = await bcrypt.compare(password, user.pw);
+      if (!isMatch) {
+        return res.status(401).json({ message: '기존 비밀번호가 틀립니다.' });
+      }
+      user.pw = await bcrypt.hash(newPassword, 10);
     }
 
-    // 일반회원 및 점주회원의 공통 정보 업데이트
-    if (name) {
-      user.name = name;
-    }
-    if (gender) {
-      user.gender = gender;
-    }
-    if (phoneNumber) {
-      user.phone = phoneNumber;
-    }
-    if (address) {
-      user.address = address;
-    }
+    // 기본 정보 업데이트
+    if (name) user.name = name;
+    if (gender) user.gender = gender;
+    if (phoneNumber) user.phone = phoneNumber;
+    if (address) user.address = address;
 
     // 점주회원일 경우 추가 정보 업데이트
     if (membershipType === 'business') {
-      if (companyName) {
-        user.shop_name = companyName;
-      }
-      if (businessType) {
-        user.shop_type = businessType;
-      }
-      if (storeAddress) {
-        user.shop_address = storeAddress;
-      }
-      if (representativeName) {
-        user.representativeName = representativeName;
-      }
-      if (businessRegistrationNumber) {
+      if (companyName) user.ownerShopname = companyName;
+      if (businessType) user.ownerShoptype = businessType;
+      if (storeAddress) user.ownerShopaddress = storeAddress;
+      if (representativeName) user.representativeName = representativeName;
+      if (businessRegistrationNumber)
         user.businessNumber = businessRegistrationNumber;
-      }
     }
 
-    await user.save(); // 변경 사항 저장
-
+    await user.save();
     return res.status(200).json({ message: '프로필이 업데이트되었습니다.' });
   } catch (error) {
     console.error('프로필 업데이트 오류:', error);
@@ -243,7 +221,6 @@ exports.deleteUser = async (req, res) => {
   try {
     let user;
 
-    // 회원 유형에 따라 사용자 조회
     if (membershipType === 'individual') {
       user = await Customer.findOne({ where: { nickname: username } });
       if (user) {
@@ -264,12 +241,74 @@ exports.deleteUser = async (req, res) => {
         .json({ message: '유효하지 않은 회원 유형입니다.' });
     }
 
-    // 사용자가 존재하지 않을 경우
     return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
   } catch (error) {
     console.error('사용자 탈퇴 오류:', error);
     return res
       .status(500)
       .json({ message: '사용자 탈퇴 중 오류가 발생했습니다.' });
+  }
+};
+
+// 로그아웃
+exports.logout = (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      return res
+        .status(500)
+        .json({ message: '로그아웃 중 오류가 발생했습니다.' });
+    }
+    res.status(200).json({ message: '로그아웃 성공' });
+  });
+};
+
+// 로그인한 사용자 정보 가져오기
+exports.getUserProfile = async (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).json({ message: '로그인이 필요합니다.' });
+  }
+
+  const userId = req.session.user.id;
+  const membershipType = req.session.user.membershipType;
+
+  try {
+    let user;
+
+    if (membershipType === 'individual') {
+      user = await Customer.findOne({ where: { id: userId } });
+    } else if (membershipType === 'business') {
+      user = await Owner.findOne({ where: { id: userId } });
+    }
+
+    if (!user) {
+      return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
+    }
+
+    return res.status(200).json({
+      message: '사용자 프로필 조회 성공',
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        gender: user.gender,
+        address: user.address,
+        join_date: user.join_date,
+        membershipType: user.membershipType,
+        // 점주회원일 경우 추가 정보
+        ...(membershipType === 'business' && {
+          businessNumber: user.businessNumber,
+          ownerShopname: user.ownerShopname,
+          ownerShopaddress: user.ownerShopaddress,
+          ownerShoptype: user.ownerShoptype,
+          representativeName: user.representativeName,
+        }),
+      },
+    });
+  } catch (error) {
+    console.error('사용자 프로필 조회 오류:', error);
+    return res
+      .status(500)
+      .json({ message: '사용자 프로필 조회 중 오류가 발생했습니다.' });
   }
 };
