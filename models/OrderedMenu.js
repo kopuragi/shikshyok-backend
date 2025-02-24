@@ -5,10 +5,6 @@ const OrderMenu = (sequelize, DataTypes) => {
       menuName: {
         type: DataTypes.STRING(255),
         allowNull: true,
-        reference: {
-          model: "order",
-          key: "menuName",
-        },
       },
       price: {
         type: DataTypes.STRING(255),
@@ -19,7 +15,7 @@ const OrderMenu = (sequelize, DataTypes) => {
         allowNull: true,
       },
       visitTime: {
-        type: DataTypes.DATE,
+        type: DataTypes.DATEONLY,
         allowNull: false,
       },
     },

@@ -1,5 +1,6 @@
 const db = require("../models");
 const { OrderedMenu, Order, Sequelize, OrderedVisitor } = db;
+const { Op, fn, col } = require("sequelize");
 exports.orderMenu = async (req, res) => {
   const { startDate, endDate } = req.body;
   try {
@@ -13,6 +14,7 @@ exports.orderMenu = async (req, res) => {
       attributes: [
         "visitTime",
         "menuName",
+        "price",
         [
           Sequelize.fn("SUM", Sequelize.col("orderedMenu.totalPrice")),
           "totalPrice",
@@ -24,14 +26,49 @@ exports.orderMenu = async (req, res) => {
           attributes: [],
         },
       ],
-      group: ["visitTime", "menuName"],
+      group: ["visitTime", "menuName", "price"],
       order: [["visitTime", "ASC"]],
     });
 
     const menu = result.map((el) => el.toJSON());
+    const priceSum = menu.reduce((sum, menu) => sum + menu.totalPrice, 0);
+    const datePerSum = menu.reduce((sum, menu) => {
+      if (sum[menu.visitTime]) {
+        sum[menu.visitTime].매출 += menu.totalPrice;
+      } else {
+        sum[menu.visitTime] = { 날짜: menu.visitTime, 매출: menu.totalPrice };
+      }
+      return sum;
+    }, {});
 
-    const menuSum = menu.reduce((sum, menu) => sum + menu.totalPrice, 0);
-    res.send({ menu, menuSum });
+    const getRandomColor = () => {
+      const letters = "0123456789ABCDEF";
+      let color = "#";
+      for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+    };
+
+    const groupedMenu = {};
+    menu.forEach((item) => {
+      const name = item.menuName;
+      const price = Number(item.price);
+      const totalPrice = Number(item.totalPrice);
+      const value = totalPrice / price;
+
+      if (!groupedMenu[name]) {
+        groupedMenu[name] = {
+          name,
+          value: 0,
+          color: getRandomColor(),
+        };
+      }
+
+      groupedMenu[name].value += value;
+    });
+
+    res.send({ menu, priceSum, datePerSum, groupedMenu });
   } catch (error) {
     console.error("Error :", error);
     res.status(500).send("Server error");
@@ -41,39 +78,50 @@ exports.orderMenu = async (req, res) => {
 exports.orderVisitor = async (req, res) => {
   try {
     const { startDate, endDate } = req.body;
+
     const result = await OrderedVisitor.findAll({
       where: {
         visitTime: {
-          [Sequelize.Op.gte]: new Date(startDate),
-          [Sequelize.Op.lt]: new Date(endDate),
+          [Op.gte]: new Date(startDate),
+          [Op.lte]: new Date(endDate),
         },
       },
-      attributes: ["visitors", "isTakeOut", "visitTime"],
-      include: [{ model: Order, attributes: [] }],
+      attributes: [
+        "visitTime",
+        "isTakeOut",
+        [fn("SUM", col("visitors")), "totalVisitors"],
+      ],
+      group: ["visitTime", "isTakeOut"],
+      order: [["visitTime", "ASC"]],
     });
-    console.log(result);
-    const takeOutResult = result.map((el) => el.toJSON());
-    const takeOutData = takeOutResult.reduce(
-      (acc, visitor) => {
-        if (visitor.isTakeOut) {
-          acc.takeOut += visitor.visitors;
-        } else {
-          acc.takeIn += visitor.visitors;
-        }
-        acc.visitors = acc.takeIn + acc.takeOut;
-        return acc;
+    const takeOut = result.map((el) => el.toJSON());
+    const takeOutData = takeOut.reduce(
+      (sum, takeout) => {
+        const type = takeout.isTakeOut === 1 ? "takeOut" : "takeIn";
+
+        const visitors = Number(takeout.totalVisitors) || 0;
+        sum[type] += visitors;
+
+        return sum;
       },
-      { takeOut: 0, takeIn: 0, visitor: 0 }
+      { takeOut: 0, takeIn: 0 }
     );
-    const takeOutDate = takeOutResult.reduce((acc, visit) => {
-      acc[visit.visitTime] = {
-        name: visit.visitTime,
-        visitors: visit.visitors,
-        isTakeOut: visit.isTakeOut,
-      };
-      return acc;
+
+    const totalVisitors = takeOut.reduce((sum, takeout) => {
+      const date = takeout.visitTime;
+      const isTakeOut = takeout.isTakeOut === 1 ? "포장" : "매장";
+
+      if (!sum[date]) {
+        sum[date] = { 날짜: date, 포장: 0, 매장: 0, 방문자수: 0 };
+      }
+
+      sum[date][isTakeOut] += Number(takeout.totalVisitors);
+      sum[date].방문자수 += Number(takeout.totalVisitors);
+
+      return sum;
     }, {});
-    res.send({ takeOutData, takeOutDate });
+
+    res.send({ takeOutData, totalVisitors });
   } catch (error) {
     console.error("Error fetching income:", error);
     res.status(500).send("Server error while fetching income.");

@@ -1,12 +1,12 @@
-const express = require('express');
+const express = require("express");
 const app = express();
 const PORT = 8082;
-const { sequelize } = require('./models');
-const indexRouter = require('./routes');
-const serverPerfix = '/api-server';
-const cors = require('cors');
-const session = require('express-session');
-const dotenv = require('dotenv');
+const { sequelize } = require("./models");
+const indexRouter = require("./routes");
+const serverPerfix = "/api-server";
+const cors = require("cors");
+const session = require("express-session");
+const dotenv = require("dotenv");
 
 dotenv.config();
 
@@ -20,7 +20,7 @@ app.use(
       secure: false,
       maxAge: 1000 * 60 * 60 * 24,
     },
-  }),
+  })
 );
 
 app.use(express.urlencoded({ extended: false }));
@@ -37,7 +37,7 @@ sequelize
       console.log(`http://localhost:${PORT}`);
     });
   })
-  .catch(err => {
+  .catch((err) => {
     console.log(err);
-    console.log('database sync 오류!');
+    console.log("database sync 오류!");
   });
