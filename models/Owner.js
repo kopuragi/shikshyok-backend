@@ -1,6 +1,6 @@
 const Owner = (sequelize, DataTypes) => {
   return sequelize.define(
-    "owner",
+    'owner',
     {
       id: {
         type: DataTypes.INTEGER,
@@ -15,7 +15,7 @@ const Owner = (sequelize, DataTypes) => {
         type: DataTypes.STRING(255),
         allowNull: false,
       },
-      userid: {
+      user_id: {
         type: DataTypes.STRING(255),
         allowNull: false,
       },
@@ -57,14 +57,14 @@ const Owner = (sequelize, DataTypes) => {
       },
       membershipType: {
         type: DataTypes.STRING(255),
-        defaultValue: "없음",
+        defaultValue: '없음',
         allowNull: false,
       },
     },
     {
       timestamps: false,
       freezeTableName: true,
-    }
+    },
   );
 };
 
