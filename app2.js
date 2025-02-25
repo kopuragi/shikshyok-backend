@@ -54,7 +54,7 @@ const orderApprovedStorage = {
 
 console.log("Connected clients:", JSON.stringify(connectedClients, null, 2));
 sequelize
-  .sync({ force: true })
+  .sync({ force: false, alter: true })
   .then(() => {
     server.listen(PORT, () => {
       console.log(`http://localhost:${PORT}`);

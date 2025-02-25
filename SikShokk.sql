@@ -1,5 +1,5 @@
 
--- Active: 1732688612707@@127.0.0.1@3306@kopuragi-- Active: 1739513174980@@127.0.0.1@3306@kopuragi
+-- Active: 1739513174980@@127.0.0.1@3306@kopuragi-- Active: 1732688612707@@127.0.0.1@3306@kopuragi-- Active: 1739513174980@@127.0.0.1@3306@kopuragi
 #데이터베이스 생성
 CREATE DATABASE Kopuragi DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
 

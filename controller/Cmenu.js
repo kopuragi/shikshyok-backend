@@ -1,4 +1,43 @@
 const { Menu, Shop } = require("../models");
+//s3 버전업
+const fs = require("fs");
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const dotenv = require("dotenv");
+dotenv.config();
+
+const s3 = new S3Client({
+  region: process.env.AWS_S3_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_S3_ACCESS_KEY,
+    secretAccessKey: process.env.AWS_S3_SECRET_ACCESS_KEY,
+  },
+});
+
+//버전업
+const uploadFile = async (file) => {
+  try {
+    const fileContent = fs.readFileSync(file.path); // 파일 경로
+    const decodeFile = Buffer.from(file.originalname, "binary").toString(
+      "utf-8"
+    );
+
+    const uploadParams = {
+      Bucket: process.env.AWS_S3_BUCKET,
+      Key: `${Date.now()}-${decodeFile}`, // 파일 이름 설정
+      Body: fileContent,
+      ACL: "public-read", // 파일 접근 권한 설정
+    };
+
+    const command = new PutObjectCommand(uploadParams);
+    const data = await s3.send(command);
+
+    console.log("Success", data);
+    return `https://${process.env.AWS_S3_BUCKET}.s3.${process.env.AWS_S3_REGION}.amazonaws.com/${uploadParams.Key}`;
+  } catch (err) {
+    console.log("Error", err);
+  }
+};
+//버전업 끝
 
 exports.getMenus = async (req, res) => {
   console.log("여기는 getMenus");
@@ -9,7 +48,8 @@ exports.getMenus = async (req, res) => {
 
 exports.createMenus = async (req, res) => {
   console.log("여기는 createMenus");
-  console.log(req.body);
+  console.log("이것은 req.body이다.", req.body);
+
   try {
     // const { userid } = req.session.user;
     // const findShopId = await Shop.findOne({
@@ -21,34 +61,37 @@ exports.createMenus = async (req, res) => {
 
     // const { shopid } = findShopId.data;
 
-    const insertMenus = await Menu.create({
-      shop_menu_id: 2,
-      //일단 임시로 아이디 값을 고정값으로 줬다.
-      //세션에 저장된 회원 아이디를 사용해서 유동적으로 가져와야 한다.
-      //데이터를 등록하는 기능 자체는 문제가 없다.
-      menuName: req.body.mname,
-      price: Number(req.body.mprice),
-      menudesc: req.body.mdesc,
-      category: req.body.mcategory,
-      originMfile: req.body.mfile,
-    });
-    const imgUrl = req.file.location;
-
-    console.log(req.file); //파일이 제대로 들어오고 있나
-
-    console.log(insertMenus);
-    res.send({ insertMenus, imgUrl });
+    console.log("이것이 req.file", req.file);
+    const decodeFile = Buffer.from(req.file.originalname, "binary").toString(
+      "utf-8"
+    );
+    console.log("인코딩을 하자! :", decodeFile);
+    //버전업
+    if (req.file) {
+      console.log("이것은 req.file이다.", req.file);
+      const fileUrl = await uploadFile(req.file);
+      const s3File = fileUrl.split("/")[3];
+      const s3Url = fileUrl.split(s3File)[0];
+      const insertMenus = await Menu.create({
+        shop_menu_id: 2,
+        //일단 임시로 아이디 값을 고정값으로 줬다.
+        //세션에 저장된 회원 아이디를 사용해서 유동적으로 가져와야 한다.
+        //데이터를 등록하는 기능 자체는 문제가 없다.
+        menuName: req.body.mname,
+        price: Number(req.body.mprice),
+        menudesc: req.body.mdesc,
+        category: req.body.mcategory,
+        originMfile: decodeFile,
+        saveMfile: encodeURIComponent(s3File),
+      });
+      res.send({ insertMenus, isUpdate: true, s3Url });
+    } else {
+      res.send({ isUpdate: false });
+    }
   } catch (err) {
     console.log("err!:", err);
   }
 };
-
-//s3에 이미지 업로드
-// exports.fileupload = async (req, res) => {
-//   console.log("여기는 fileupload");
-//   console.log(req.file.location);
-//   res.send({ imgUrl });
-// };
 
 //메뉴 정보 수정
 exports.updateMenus = async (req, res) => {
@@ -65,27 +108,72 @@ exports.updateMenus = async (req, res) => {
     // console.log(findShopId);
 
     // const { shopid } = findShopId.data;
-    const chgMenus = await Menu.update(
-      {
-        menuName: req.body.chgname,
-        price: Number(req.body.chgprice),
-        menudesc: req.body.chgdesc,
-        category: req.body.chgcategory,
-        originMfile: req.body.chgfile,
-      },
-      {
-        where: {
-          id: req.body.id,
-        },
-      }
+    const decodeFile = Buffer.from(req.file.originalname, "binary").toString(
+      "utf-8"
     );
-
-    const imgUrl = req.file.location;
-
-    console.log(req.file); //파일이 제대로 들어오고 있나
-
-    res.send({ chgMenus, imgUrl });
+    console.log("인코딩을 하자! :", decodeFile);
+    //버전업
+    if (req.file) {
+      console.log("이것은 req.file이다.", req.file);
+      const fileUrl = await uploadFile(req.file);
+      console.log(fileUrl);
+      const s3File = fileUrl.split("/")[3];
+      const s3Url = fileUrl.split(s3File)[0];
+      const chgMenus = await Menu.update(
+        {
+          menuName: req.body.chgname,
+          price: Number(req.body.chgprice),
+          menudesc: req.body.chgdesc,
+          category: req.body.chgcategory,
+          originMfile: decodeFile,
+          saveMfile: encodeURIComponent(s3File),
+        },
+        {
+          where: {
+            id: req.body.id,
+          },
+        }
+      );
+      res.send({ chgMenus, isUpdate: true, s3Url });
+    }
   } catch (err) {
     console.log("err", err);
+  }
+};
+
+exports.deleteMenu = async (req, res) => {
+  try {
+    console.log(req.body);
+    const throwMenu = await Menu.destroy({
+      where: {
+        id: req.body.id,
+      },
+    });
+    res.send({ isDelete: true });
+  } catch (err) {
+    console.log("delete 에러입니다!!:", err);
+    res.send({ isDelete: false });
+  }
+};
+
+//가게 등록 컨트롤러
+//어디다 적어놔야 하지
+exports.createShop = async (req, res) => {
+  console.log("여기는 createShop");
+  try {
+    const addshop = await Shop.create({
+      owner_id: 1, //임시값
+      shopName: req.body.sname,
+      businessNumber: req.body.sbrn,
+      shopAddress: req.body.saddress,
+      shopPhone: req.body.sphone,
+      shopType: req.body.stype,
+      shopOwner: req.body.sowner,
+    });
+
+    res.send({ isAdd: true });
+  } catch (err) {
+    console.log("error!!:", err);
+    res.send({ isAdd: false });
   }
 };
