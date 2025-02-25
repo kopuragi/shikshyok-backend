@@ -109,41 +109,81 @@ exports.signUp = async (req, res) => {
 
 // 로그인
 exports.login = async (req, res) => {
-  const { user_id, password } = req.body;
+  const { user_id, password, membershipType } = req.body;
 
   console.log(`로그인 요청: ${user_id}`);
+  console.log(`로그인 요청: ${membershipType} 회원`);
 
-  try {
-    const user = await Customer.findOne({ where: { user_id: user_id } });
-    if (!user) {
-      user = await Owner.findOne({ where: { user_id } });
+  if (membershipType === "individual") {
+    try {
+      const user = await Customer.findOne({ where: { user_id: user_id } });
+
       if (!user) {
         return res.status(404).json({ message: "사용자를 찾을 수 없습니다." });
+      } else {
+        const isMatch = await bcrypt.compare(password, user.pw);
+        if (!isMatch) {
+          return res.status(401).json({ message: "비밀번호가 틀립니다." });
+        }
+
+        req.session.user = {
+          id: user.id,
+          userid: user.user_id,
+          membershipType: user.membershipType,
+        };
+
+        return res.status(200).json({
+          message: "로그인 성공",
+          membershipType: user.membershipType,
+          isSuccess: true,
+          id: user.id,
+          nickname: user.nickname,
+          user_id: user.user_id,
+          type: user.membershipType,
+        });
       }
+    } catch (error) {
+      console.error("로그인 오류:", error);
+      return res
+        .status(500)
+        .json({ message: "로그인 중 오류가 발생했습니다." });
     }
+  }
 
-    const isMatch = await bcrypt.compare(password, user.pw);
-    if (!isMatch) {
-      return res.status(401).json({ message: "비밀번호가 틀립니다." });
+  if (membershipType === "business") {
+    try {
+      const user = await Owner.findOne({ where: { userid: user_id } });
+
+      if (!user) {
+        return res.status(404).json({ message: "사용자를 찾을 수 없습니다." });
+      } else {
+        const isMatch = await bcrypt.compare(password, user.pw);
+        if (!isMatch) {
+          return res.status(401).json({ message: "비밀번호가 틀립니다." });
+        }
+
+        req.session.user = {
+          id: user.id,
+          userid: user.userid,
+          membershipType: user.membershipType,
+        };
+
+        return res.status(200).json({
+          message: "로그인 성공",
+          membershipType: user.membershipType,
+          isSuccess: true,
+          id: user.id,
+          nickname: user.nickname,
+          user_id: user.userid,
+          type: user.membershipType,
+        });
+      }
+    } catch (error) {
+      console.error("로그인 오류:", error);
+      return res
+        .status(500)
+        .json({ message: "로그인 중 오류가 발생했습니다." });
     }
-
-    req.session.user = {
-      id: user.id,
-      userid: user.userid || user.user_id,
-      membershipType: user.membershipType,
-    };
-
-    return res.status(200).json({
-      message: "로그인 성공",
-      membershipType: user.membershipType,
-      isSuccess: true,
-      id: user.id,
-      nickname: user.nickname,
-      user_id: user.user_id,
-    });
-  } catch (error) {
-    console.error("로그인 오류:", error);
-    return res.status(500).json({ message: "로그인 중 오류가 발생했습니다." });
   }
 };
 
