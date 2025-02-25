@@ -65,8 +65,8 @@ router.post('/login', userController.login);
 // 로그인한 사용자 정보 가져오기
 router.get('/me', userController.getUserProfile);
 
-// 사용자 탈퇴 (userId로 변경)
-router.delete('/delete/:membershipType/:username', userController.deleteUser);
+// 사용자 탈퇴
+router.delete('/delete/:nickname', userController.deleteUser);
 
 // 사용자 프로필 수정
 router.put('/update', userController.updateUserProfile);

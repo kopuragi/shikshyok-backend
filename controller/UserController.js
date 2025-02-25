@@ -7,6 +7,7 @@ const Owner = db.Owner;
 exports.signUp = async (req, res) => {
   const {
     nickname,
+    user_id, // user_id 추가
     password,
     name,
     gender,
@@ -21,7 +22,8 @@ exports.signUp = async (req, res) => {
   } = req.body;
 
   // 입력 유효성 검사
-  if (!nickname || !password || !email || !phoneNumber) {
+  if (!nickname || !user_id || !password || !email || !phoneNumber) {
+    // user_id 검증 추가
     return res
       .status(400)
       .json({ success: false, message: '필수 정보를 입력하세요.' });
@@ -48,7 +50,7 @@ exports.signUp = async (req, res) => {
         name,
         nickname,
         gender,
-        user_id: nickname,
+        user_id, // user_id를 여기에 추가
         pw: hashedPassword,
         email,
         phone: phoneNumber,
@@ -57,9 +59,7 @@ exports.signUp = async (req, res) => {
         membershipType,
       });
     } else if (membershipType === 'business') {
-      const existingOwner = await Owner.findOne({
-        where: { user_id: nickname },
-      });
+      const existingOwner = await Owner.findOne({ where: { user_id } });
       if (existingOwner)
         return res
           .status(400)
@@ -75,7 +75,7 @@ exports.signUp = async (req, res) => {
       newUser = await Owner.create({
         name,
         nickname,
-        user_id: nickname,
+        user_id, // user_id를 여기에 추가
         pw: hashedPassword,
         email,
         phone: phoneNumber,
@@ -126,9 +126,10 @@ exports.login = async (req, res) => {
         .status(401)
         .json({ success: false, message: '비밀번호가 틀립니다.' });
 
+    // 세션에 사용자 정보 저장
     req.session.user = {
       id: user.id,
-      user_id: user.user_id,
+      user_id: user.user_id, // user_id가 세션에 저장되는지 확인
       membershipType: user.membershipType,
     };
 
@@ -241,43 +242,33 @@ exports.updateUserProfile = async (req, res) => {
 
 // 사용자 탈퇴 핸들러
 exports.deleteUser = async (req, res) => {
-  const { username, membershipType } = req.params;
+  const { nickname } = req.params; // nickname으로 변경
+
+  console.log(`탈퇴 요청받음: ${nickname}`); // 요청 로그 추가
 
   try {
-    let user;
-
-    if (membershipType === 'individual') {
-      user = await Customer.findOne({ where: { nickname: username } });
-      if (user) {
-        await Customer.destroy({ where: { nickname: username } });
-        console.log(`삭제됨: 일반회원 (${username})`);
-        return res
-          .status(200)
-          .json({ success: true, message: '사용자가 탈퇴되었습니다.' });
-      }
-    } else if (membershipType === 'business') {
-      user = await Owner.findOne({ where: { user_id: username } });
-      if (user) {
-        await Owner.destroy({ where: { user_id: username } });
-        console.log(`삭제됨: 점주회원 (${username})`);
-        return res
-          .status(200)
-          .json({ success: true, message: '사용자가 탈퇴되었습니다.' });
-      }
-    } else {
-      return res
-        .status(400)
-        .json({ success: false, message: '유효하지 않은 회원 유형입니다.' });
+    // 일반회원 처리
+    let user = await Customer.findOne({ where: { nickname } }); // nickname 기준으로 찾기
+    if (user) {
+      await Customer.destroy({ where: { nickname } });
+      console.log(`삭제됨: 일반회원 (${nickname})`);
+      return res.status(200).json({ message: '사용자가 탈퇴되었습니다.' });
     }
 
-    return res
-      .status(404)
-      .json({ success: false, message: '사용자를 찾을 수 없습니다.' });
+    // 점주회원 처리
+    user = await Owner.findOne({ where: { nickname } }); // nickname 기준으로 찾기
+    if (user) {
+      await Owner.destroy({ where: { nickname } });
+      console.log(`삭제됨: 점주회원 (${nickname})`);
+      return res.status(200).json({ message: '사용자가 탈퇴되었습니다.' });
+    }
+
+    return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
   } catch (error) {
     console.error('사용자 탈퇴 오류:', error);
     return res
       .status(500)
-      .json({ success: false, message: '사용자 탈퇴 중 오류가 발생했습니다.' });
+      .json({ message: '사용자 탈퇴 중 오류가 발생했습니다.' });
   }
 };
 
@@ -302,7 +293,7 @@ exports.getUserProfile = async (req, res) => {
       .json({ success: false, message: '로그인이 필요합니다.' });
   }
 
-  const userId = req.session.user.id;
+  const userId = req.session.user.id; // 세션에서 사용자 ID 가져오기
   const membershipType = req.session.user.membershipType;
 
   try {
