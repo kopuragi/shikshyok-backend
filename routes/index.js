@@ -6,31 +6,12 @@ const review = require("../controller/Review");
 const menu = require("../controller/Cmenu");
 const userController = require("../controller/UserController");
 //s3설정
-const dotenv = require("dotenv");
 const multer = require("multer");
 const aws = require("aws-sdk");
-const s3 = new aws.S3();
 const multerS3 = require("multer-s3");
-dotenv.config();
+//버전업
 
-//어느 s3에 업로드할 것인지 결정
-aws.config.update({
-  accessKeyId: process.env.AWS_S3_ACCESS_KEY,
-  secretAccessKey: process.env.AWS_S3_SECRET_ACCESS_KEY,
-  region: process.env.AWS_S3_REGION,
-});
-
-//업로드할 때의 옵션 설정
-const upload = multer({
-  storage: multerS3({
-    s3: s3,
-    bucket: process.env.AWS_S3_BUCKET,
-    acl: "public-read", //파일 접근 권한 설정
-    key: (req, file, cb) => {
-      cb(null, Date.now().toString() + "-" + file.originalname);
-    },
-  }),
-});
+const upload = multer({ dest: "uploads/" });
 
 // GET /api-server
 router.get("/", controller.getIndex);
@@ -64,15 +45,16 @@ router.delete("/owner-review/:id", review.deleteOwnerReview);
 router.get("/menu-list", menu.getMenus);
 
 // POST /api-server/menu-register
-// router.post("/menu-register", menu.createMenus);
 router.post("/menu-register", upload.single("image"), menu.createMenus);
 
-// POST /api-server/upload
-// router.post("/upload", upload.single("image"), menu.fileupload);
-
 // PATCH /api-server/menu-change
-// router.patch("/menu-change", menu.updateMenus);
 router.patch("/menu-change", upload.single("image"), menu.updateMenus);
+
+// DELETE /api-server/menu-delete
+router.delete("/menu-delete", menu.deleteMenu);
+
+//POST /api-server/shop-register
+router.post("/shop-register", menu.createShop);
 
 // 회원가입
 router.post("/signup", userController.signUp);
