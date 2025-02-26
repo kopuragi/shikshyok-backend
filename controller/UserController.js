@@ -2,45 +2,46 @@ const db = require("../models");
 const bcrypt = require("bcrypt");
 const Customer = db.Customer;
 const Owner = db.Owner;
+const Shop = db.Shop;
 
 //owner 회원가입 시키기 가게 등록하기
-exports.createOwners = async () => {
-  for (let i = 1; i <= 10; i++) {
-    const user_id = `owner${i.toString().padStart(2, "0")}`;
-    const email = `owner${i}@example.com`;
+exports.createOwners = async (req, res) => {
+  const idNumber = await Owner.findOne({
+    order: [["id", "DESC"]],
+  });
+
+  if (idNumber) {
+    console.log(idNumber.id);
+    id = idNumber.id + 1;
+    console.log(id);
+  } else {
+    id = 0;
+  }
+
+  for (let i = 0; i < 10; i++) {
+    const user_id = `owner${id.toString().padStart(2, "0")}`;
+    const email = `owner${id}@example.com`;
     const password = "1234"; // 여기에 실제 비밀번호를 넣어주세요
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const existingOwner = await Owner.findOne({ where: { userid: user_id } });
-    if (existingOwner) {
-      console.log(`이미 사용 중인 userid: ${user_id}`);
-      continue;
-    }
-
-    const existingOwnerEmail = await Owner.findOne({ where: { email } });
-    if (existingOwnerEmail) {
-      console.log(`이미 사용 중인 이메일: ${email}`);
-      continue;
-    }
-
     const newOwner = await Owner.create({
-      name: `ownerName${i}`,
-      nickname: `ownerNickname${i}`,
-      userid: user_id,
+      name: `ownerName${id}`,
+      nickname: `ownerNickname${id}`,
+      userid: `owner${id}`,
       pw: hashedPassword,
       email,
-      phone: `010-1234-567${i}`,
-      businessNumber: `123-45-678${i}`,
-      ownerShopname: `치킨킨${i}`,
-      ownerShopaddress: `도봉구${i}`,
+      phone: `010-1234-567${id}`,
+      businessNumber: `123-45-678${id}`,
+      ownerShopname: `치킨킨${id}`,
+      ownerShopaddress: `도봉구${id}`,
       ownerShoptype: "한식", // 실제로 필요한 값을 넣어주세요
-      representativeName: `대표${i}`,
+      representativeName: `대표${id}`,
       join_date: new Date().toISOString(),
       isDelete: "N",
       membershipType: "business", // 실제로 필요한 값을 넣어주세요
     });
 
-    const newShop = await Shop.createShop({
+    const newShop = await Shop.create({
       // owner_id
       // shopName
       // businessNumber
@@ -48,55 +49,58 @@ exports.createOwners = async () => {
       // shopPhone
       // shopType
       // shopOwner
+
+      owner_id: newOwner.id,
+      shopName: `치킨킨${id}`,
+      businessNumber: `123-45-678${id}`,
+      shopAddress: `도봉구${id}`,
+      shopPhone: `010-1234-567${id}`,
+      shopType: "한식",
+      shopOwner: `ownerName${id}`,
     });
 
+    id++;
     console.log(`오너 생성 완료: ${user_id}`);
   }
+  res.send("오너 생성 완료");
 };
 
 //customer 회원가입 시키기
-exports.createCustomers = async () => {
-  // 마지막 기본 키 값을 조회합니다.
-  const lastCustomer = await Customer.findOne({
+exports.createCustomers = async (req, res) => {
+  const idNumber = await Customer.findOne({
     order: [["id", "DESC"]],
   });
 
-  // 만약 마지막 고객이 존재하지 않으면 기본값을 0으로 설정합니다.
-  let startId = lastCustomer ? lastCustomer.id : 0;
+  if (idNumber) {
+    console.log(idNumber.id);
+    id = idNumber.id + 1;
+    console.log(id);
+  } else {
+    id = 0;
+  }
 
-  for (let i = startId + 1; i <= startId + 10; i++) {
-    const nickname = `customer${i.toString().padStart(2, "0")}`;
-    const email = `customer${i}@naver.com`;
+  for (let i = 0; i < 10; i++) {
+    const user_id = `customer${id.toString().padStart(2, "0")}`;
+    const email = `customer${id}@example.com`;
     const password = "1234"; // 여기에 실제 비밀번호를 넣어주세요
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const existingUser = await Customer.findOne({ where: { nickname } });
-    if (existingUser) {
-      console.log(`이미 사용 중인 닉네임: ${nickname}`);
-      continue;
-    }
-
-    const existingEmail = await Customer.findOne({ where: { email } });
-    if (existingEmail) {
-      console.log(`이미 사용 중인 이메일: ${email}`);
-      continue;
-    }
-
     const newUser = await Customer.create({
-      name: `고객${i}`,
-      nickname,
+      name: `고객${id}`,
+      nickname: `고객닉${id}`,
       gender: "남", // 실제로 필요한 값을 넣어주세요
-      user_id: `user${i}`,
+      user_id: `customer${id}`,
       pw: hashedPassword,
       email,
-      phone: `010-1234-567${i}`,
+      phone: `010-1234-567${id}`,
       join_date: new Date().toISOString(),
       isDelete: "N",
       membershipType: "individual", // 실제로 필요한 값을 넣어주세요
     });
-
-    console.log(`회원 생성 완료: ${nickname}`);
+    id++;
+    console.log(`회원 생성 완료: ${user_id}`);
   }
+  res.send("회원 생성 완료");
 };
 
 // 회원가입
