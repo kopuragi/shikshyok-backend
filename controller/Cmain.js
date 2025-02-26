@@ -6,23 +6,12 @@ exports.getIndex = (req, res) => {
 
 exports.getOwner = async (req, res) => {
   try {
-    // 세션에서 userId 가져오기
-    // if (!req.session.userId) {
-    //   return res.status(401).json({ message: "로그인 필요" });
-    // }
-
-    console.log(req.query.userId); // test 용
-    const token = req.query.userId; // test용 params=1 받는것
-
-    // 사용자 아이디로 가게 목록 조회
-    // const shops = await Shop.findAll({
-    // where: { ownerId: req.session.userId } });
+    console.log(req.query.userId); // 사용자 id number
 
     const shops = await Shop.findAll({
-      where: { owner_id: token },
+      where: { owner_id: req.query.userId },
       attributes: ["id", "shopName"], //가게아이디와 가게이름만 조회
     });
-    // console.log(shops);
 
     res.status(200).json({ shops });
   } catch (err) {

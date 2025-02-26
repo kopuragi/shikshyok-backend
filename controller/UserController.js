@@ -1,8 +1,110 @@
 const db = require("../models");
 const bcrypt = require("bcrypt");
+
 const Shop = db.Shop;
+
 const Customer = db.Customer;
 const Owner = db.Owner;
+const Shop = db.Shop;
+
+//owner 회원가입 시키기 가게 등록하기
+exports.createOwners = async (req, res) => {
+  const idNumber = await Owner.findOne({
+    order: [["id", "DESC"]],
+  });
+
+  if (idNumber) {
+    console.log(idNumber.id);
+    id = idNumber.id + 1;
+    console.log(id);
+  } else {
+    id = 0;
+  }
+
+  for (let i = 0; i < 10; i++) {
+    const user_id = `owner${id.toString().padStart(2, "0")}`;
+    const email = `owner${id}@example.com`;
+    const password = "1234"; // 여기에 실제 비밀번호를 넣어주세요
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newOwner = await Owner.create({
+      name: `ownerName${id}`,
+      nickname: `ownerNickname${id}`,
+      userid: `owner${id}`,
+      pw: hashedPassword,
+      email,
+      phone: `010-1234-567${id}`,
+      businessNumber: `123-45-678${id}`,
+      ownerShopname: `치킨킨${id}`,
+      ownerShopaddress: `도봉구${id}`,
+      ownerShoptype: "한식", // 실제로 필요한 값을 넣어주세요
+      representativeName: `대표${id}`,
+      join_date: new Date().toISOString(),
+      isDelete: "N",
+      membershipType: "business", // 실제로 필요한 값을 넣어주세요
+    });
+
+    const newShop = await Shop.create({
+      // owner_id
+      // shopName
+      // businessNumber
+      // shopAddress
+      // shopPhone
+      // shopType
+      // shopOwner
+
+      owner_id: newOwner.id,
+      shopName: `치킨킨${id}`,
+      businessNumber: `123-45-678${id}`,
+      shopAddress: `도봉구${id}`,
+      shopPhone: `010-1234-567${id}`,
+      shopType: "한식",
+      shopOwner: `ownerName${id}`,
+    });
+
+    id++;
+    console.log(`오너 생성 완료: ${user_id}`);
+  }
+  res.send("오너 생성 완료");
+};
+
+//customer 회원가입 시키기
+exports.createCustomers = async (req, res) => {
+  const idNumber = await Customer.findOne({
+    order: [["id", "DESC"]],
+  });
+
+  if (idNumber) {
+    console.log(idNumber.id);
+    id = idNumber.id + 1;
+    console.log(id);
+  } else {
+    id = 0;
+  }
+
+  for (let i = 0; i < 10; i++) {
+    const user_id = `customer${id.toString().padStart(2, "0")}`;
+    const email = `customer${id}@example.com`;
+    const password = "1234"; // 여기에 실제 비밀번호를 넣어주세요
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = await Customer.create({
+      name: `고객${id}`,
+      nickname: `고객닉${id}`,
+      gender: "남", // 실제로 필요한 값을 넣어주세요
+      user_id: `customer${id}`,
+      pw: hashedPassword,
+      email,
+      phone: `010-1234-567${id}`,
+      join_date: new Date().toISOString(),
+      isDelete: "N",
+      membershipType: "individual", // 실제로 필요한 값을 넣어주세요
+    });
+    id++;
+    console.log(`회원 생성 완료: ${user_id}`);
+  }
+  res.send("회원 생성 완료");
+};
 
 // 회원가입
 exports.signUp = async (req, res) => {
@@ -151,6 +253,7 @@ exports.login = async (req, res) => {
           nickname: user.nickname,
           user_id: user.user_id,
           type: user.membershipType,
+          phone: user.phone,
         });
       }
     } catch (error) {
@@ -192,6 +295,7 @@ exports.login = async (req, res) => {
           nickname: user.nickname,
           user_id: user.userid,
           type: user.membershipType,
+          phone: user.phone,
         });
       }
     } catch (error) {
@@ -277,10 +381,10 @@ exports.updateUserProfile = async (req, res) => {
 
 // 사용자 탈퇴 핸들러
 exports.deleteUser = async (req, res) => {
-  const { username, membershipType } = req.params;
+  const { nickname } = req.params;
 
   try {
-    let user;
+    let user = await Customer.findOne({ where: { nickname } });
 
     if (membershipType === "individual") {
       user = await Customer.findOne({ where: { nickname: username } });
@@ -300,9 +404,31 @@ exports.deleteUser = async (req, res) => {
       return res
         .status(400)
         .json({ message: "유효하지 않은 회원 유형입니다." });
+
     }
 
     return res.status(404).json({ message: "사용자를 찾을 수 없습니다." });
+
+
+      if (!user) {
+        // 만약 일반회원이 아니라면 비즈니스 회원도 체크
+        user = await Owner.findOne({ where: { userid: nickname } }); // userid로 변경
+        if (user) {
+          await Owner.destroy({ where: { userid: nickname } });
+          console.log(`삭제됨: 점주회원 (${nickname})`);
+          return res.status(200).json({ message: "사용자가 탈퇴되었습니다." });
+        }
+      }
+
+      if (user) {
+        await Customer.destroy({ where: { nickname } });
+        console.log(`삭제됨: 일반회원 (${nickname})`);
+        return res.status(200).json({ message: "사용자가 탈퇴되었습니다." });
+      }
+
+      return res.status(404).json({ message: "사용자를 찾을 수 없습니다." });
+    }
+
   } catch (error) {
     console.error("사용자 탈퇴 오류:", error);
     return res
