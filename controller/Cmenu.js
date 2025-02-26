@@ -49,12 +49,14 @@ exports.getMenus = async (req, res) => {
 exports.createMenus = async (req, res) => {
   console.log("여기는 createMenus");
   console.log("이것은 req.body이다.", req.body);
+  console.log("이것은 req.session.user: ", req.session);
 
   try {
-    // const { userid } = req.session.user;
+    // const { id } = req.session.user;
+    // console.log(id);
     // const findShopId = await Shop.findOne({
     //   where: {
-    //     owner_id: userid,
+    //     owner_id: id,
     //   },
     // });
     // console.log(findShopId);
@@ -73,10 +75,8 @@ exports.createMenus = async (req, res) => {
       const s3File = fileUrl.split("/")[3];
       const s3Url = fileUrl.split(s3File)[0];
       const insertMenus = await Menu.create({
-        shop_menu_id: 2,
-        //일단 임시로 아이디 값을 고정값으로 줬다.
-        //세션에 저장된 회원 아이디를 사용해서 유동적으로 가져와야 한다.
-        //데이터를 등록하는 기능 자체는 문제가 없다.
+        // shop_menu_id: shopid, //id가 과연...
+        shop_menu_id: 2, //id가 과연...
         menuName: req.body.mname,
         price: Number(req.body.mprice),
         menudesc: req.body.mdesc,
@@ -99,15 +99,15 @@ exports.updateMenus = async (req, res) => {
   console.log(req.body);
 
   try {
-    // const { userid } = req.session.user;
-    // const findShopId = await Shop.findOne({
-    //   where: {
-    //     owner_id: userid,
-    //   },
-    // });
-    // console.log(findShopId);
+    const { userid } = req.session.user;
+    const findShopId = await Shop.findOne({
+      where: {
+        owner_id: userid,
+      },
+    });
+    console.log(findShopId);
 
-    // const { shopid } = findShopId.data;
+    const { shopid } = findShopId.data;
     const decodeFile = Buffer.from(req.file.originalname, "binary").toString(
       "utf-8"
     );
@@ -121,6 +121,7 @@ exports.updateMenus = async (req, res) => {
       const s3Url = fileUrl.split(s3File)[0];
       const chgMenus = await Menu.update(
         {
+          shop_menu_id: shopid,
           menuName: req.body.chgname,
           price: Number(req.body.chgprice),
           menudesc: req.body.chgdesc,
