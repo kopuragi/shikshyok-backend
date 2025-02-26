@@ -87,4 +87,7 @@ router.get("/review", review.getReview);
 //사용자 리뷰 등록 post /api-sever/review
 router.post("/review", upload1.single("image"), review.postReview);
 
+//리뷰 위한 손님주문목록 조회
+router.get("/customerOrderAllHistory", review.OrderAll);
+
 module.exports = router;
