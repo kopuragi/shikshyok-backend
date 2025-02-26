@@ -43,7 +43,7 @@ exports.getMenus = async (req, res) => {
   console.log("여기는 getMenus");
   console.log(req.query);
 
-  const { shopId } = req.query;
+  const { shopId, owner_id } = req.query;
   //스타벅스(서브 가게)에 메뉴를 추가하고 나면 shopId가 전달되지 않는다.
   //좀 더 정확히는, shopId가 텅 비어있는 상태다. undefined
   //그렇다면, Menus 페이지에 있는 crossId가 undefined가 된다는 뜻.
@@ -55,11 +55,15 @@ exports.getMenus = async (req, res) => {
   //그런데 select로 선택한 값을 사용해야 하기는 한다.
   //shopId를 어디서든 사용할 수 있게 하면서, select에 따라 유동적으로 변하도록
 
-  // const findShop = await Shop.findAll({
-  //   where: {
-  //     owner_id: owner_id,
-  //   },
-  // });
+  const findShop = await Shop.findAll({
+    where: {
+      owner_id: owner_id,
+    },
+  });
+  console.log("이건 findShop: ", findShop[0].dataValues);
+  //이 findShop 안의 id를 보내줘야 할까?
+  const { id } = findShop[0].dataValues;
+  console.log("findShop에서 뽑아낸 가게의 id", id);
 
   const findMenus = await Menu.findAll({
     where: {
@@ -87,7 +91,7 @@ exports.createMenus = async (req, res) => {
     // console.log("shop의 id: ", id);
 
     const shopId = Number(req.body.shopId);
-    console.log("createMenus 안의 ShopId");
+    console.log("createMenus 안의 ShopId", shopId);
 
     const decodeFile = Buffer.from(req.file.originalname, "binary").toString(
       "utf-8"

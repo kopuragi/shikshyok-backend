@@ -1,5 +1,6 @@
-const db = require('../models');
-const bcrypt = require('bcrypt');
+const db = require("../models");
+const bcrypt = require("bcrypt");
+const Shop = db.Shop;
 const Customer = db.Customer;
 const Owner = db.Owner;
 
@@ -24,24 +25,24 @@ exports.signUp = async (req, res) => {
   if (!nickname || !user_id || !password || !email || !phoneNumber) {
     return res
       .status(400)
-      .json({ success: false, message: '필수 정보를 입력하세요.' });
+      .json({ success: false, message: "필수 정보를 입력하세요." });
   }
 
   try {
     let newUser;
 
-    if (membershipType === 'individual') {
+    if (membershipType === "individual") {
       const existingUser = await Customer.findOne({ where: { nickname } });
       if (existingUser)
         return res
           .status(400)
-          .json({ success: false, message: '이미 사용 중인 닉네임입니다.' });
+          .json({ success: false, message: "이미 사용 중인 닉네임입니다." });
 
       const existingEmail = await Customer.findOne({ where: { email } });
       if (existingEmail)
         return res
           .status(400)
-          .json({ success: false, message: '이미 사용 중인 이메일입니다.' });
+          .json({ success: false, message: "이미 사용 중인 이메일입니다." });
 
       const hashedPassword = await bcrypt.hash(password, 10);
       newUser = await Customer.create({
@@ -53,21 +54,21 @@ exports.signUp = async (req, res) => {
         email,
         phone: phoneNumber,
         join_date: new Date().toISOString(),
-        isDelete: 'N',
+        isDelete: "N",
         membershipType,
       });
-    } else if (membershipType === 'business') {
+    } else if (membershipType === "business") {
       const existingOwner = await Owner.findOne({ where: { userid: user_id } });
       if (existingOwner)
         return res
           .status(400)
-          .json({ success: false, message: '이미 사용 중인 닉네임입니다.' });
+          .json({ success: false, message: "이미 사용 중인 닉네임입니다." });
 
       const existingOwnerEmail = await Owner.findOne({ where: { email } });
       if (existingOwnerEmail)
         return res
           .status(400)
-          .json({ success: false, message: '이미 사용 중인 이메일입니다.' });
+          .json({ success: false, message: "이미 사용 중인 이메일입니다." });
 
       const hashedPassword = await bcrypt.hash(password, 10);
       newUser = await Owner.create({
@@ -83,25 +84,37 @@ exports.signUp = async (req, res) => {
         ownerShoptype: businessType,
         representativeName,
         join_date: new Date().toISOString(),
-        isDelete: 'N',
+        isDelete: "N",
         membershipType,
       });
+      //가게 정보 등록
+      addshop = await Shop.create({
+        owner_id: newUser.id, //임시값
+        shopName: companyName,
+        businessNumber: businessRegistrationNumber,
+        shopAddress: storeAddress,
+        shopPhone: phoneNumber,
+        shopType: businessType,
+        shopOwner: representativeName,
+      });
+
+      if (addshop) console.log("회원가입 겸 가게 추가 성공");
     } else {
       return res
         .status(400)
-        .json({ success: false, message: '유효하지 않은 회원 유형입니다.' });
+        .json({ success: false, message: "유효하지 않은 회원 유형입니다." });
     }
 
     res.status(201).json({
       success: true,
-      message: '회원가입이 완료되었습니다.',
+      message: "회원가입이 완료되었습니다.",
       userId: newUser.id,
     });
   } catch (error) {
-    console.error('회원가입 오류:', error);
+    console.error("회원가입 오류:", error);
     res
       .status(500)
-      .json({ success: false, message: '회원가입 중 오류가 발생했습니다.' });
+      .json({ success: false, message: "회원가입 중 오류가 발생했습니다." });
   }
 };
 
@@ -112,16 +125,16 @@ exports.login = async (req, res) => {
   console.log(`로그인 요청: ${user_id}`);
   console.log(`로그인 요청: ${membershipType} 회원`);
 
-  if (membershipType === 'individual') {
+  if (membershipType === "individual") {
     try {
       const user = await Customer.findOne({ where: { user_id: user_id } });
 
       if (!user) {
-        return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
+        return res.status(404).json({ message: "사용자를 찾을 수 없습니다." });
       } else {
         const isMatch = await bcrypt.compare(password, user.pw);
         if (!isMatch) {
-          return res.status(401).json({ message: '비밀번호가 틀립니다.' });
+          return res.status(401).json({ message: "비밀번호가 틀립니다." });
         }
 
         req.session.user = {
@@ -131,7 +144,7 @@ exports.login = async (req, res) => {
         };
 
         return res.status(200).json({
-          message: '로그인 성공',
+          message: "로그인 성공",
           membershipType: user.membershipType,
           isSuccess: true,
           id: user.id,
@@ -141,23 +154,23 @@ exports.login = async (req, res) => {
         });
       }
     } catch (error) {
-      console.error('로그인 오류:', error);
+      console.error("로그인 오류:", error);
       return res
         .status(500)
-        .json({ message: '로그인 중 오류가 발생했습니다.' });
+        .json({ message: "로그인 중 오류가 발생했습니다." });
     }
   }
 
-  if (membershipType === 'business') {
+  if (membershipType === "business") {
     try {
       const user = await Owner.findOne({ where: { userid: user_id } });
 
       if (!user) {
-        return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
+        return res.status(404).json({ message: "사용자를 찾을 수 없습니다." });
       } else {
         const isMatch = await bcrypt.compare(password, user.pw);
         if (!isMatch) {
-          return res.status(401).json({ message: '비밀번호가 틀립니다.' });
+          return res.status(401).json({ message: "비밀번호가 틀립니다." });
         }
 
         console.log("세션 앞");
@@ -172,7 +185,7 @@ exports.login = async (req, res) => {
         console.log("세션 후");
 
         return res.status(200).json({
-          message: '로그인 성공',
+          message: "로그인 성공",
           membershipType: user.membershipType,
           isSuccess: true,
           id: user.id,
@@ -182,10 +195,10 @@ exports.login = async (req, res) => {
         });
       }
     } catch (error) {
-      console.error('로그인 오류:', error);
+      console.error("로그인 오류:", error);
       return res
         .status(500)
-        .json({ message: '로그인 중 오류가 발생했습니다.' });
+        .json({ message: "로그인 중 오류가 발생했습니다." });
     }
   }
 };
@@ -212,20 +225,20 @@ exports.updateUserProfile = async (req, res) => {
   try {
     let user;
 
-    if (membershipType === 'individual') {
+    if (membershipType === "individual") {
       user = await Customer.findOne({ where: { nickname } });
-    } else if (membershipType === 'business') {
+    } else if (membershipType === "business") {
       user = await Owner.findOne({
         where: { userid: req.session.user.user_id },
       });
     } else {
       return res
         .status(400)
-        .json({ message: '유효하지 않은 회원 유형입니다.' });
+        .json({ message: "유효하지 않은 회원 유형입니다." });
     }
 
     if (!user) {
-      return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
+      return res.status(404).json({ message: "사용자를 찾을 수 없습니다." });
     }
 
     if (email) user.email = email;
@@ -233,7 +246,7 @@ exports.updateUserProfile = async (req, res) => {
     if (password && newPassword) {
       const isMatch = await bcrypt.compare(password, user.pw);
       if (!isMatch) {
-        return res.status(401).json({ message: '기존 비밀번호가 틀립니다.' });
+        return res.status(401).json({ message: "기존 비밀번호가 틀립니다." });
       }
       user.pw = await bcrypt.hash(newPassword, 10);
     }
@@ -243,7 +256,7 @@ exports.updateUserProfile = async (req, res) => {
     if (phoneNumber) user.phone = phoneNumber;
     if (address) user.address = address;
 
-    if (membershipType === 'business') {
+    if (membershipType === "business") {
       if (companyName) user.ownerShopname = companyName;
       if (businessType) user.ownerShoptype = businessType;
       if (storeAddress) user.ownerShopaddress = storeAddress;
@@ -253,12 +266,12 @@ exports.updateUserProfile = async (req, res) => {
     }
 
     await user.save();
-    return res.status(200).json({ message: '프로필이 업데이트되었습니다.' });
+    return res.status(200).json({ message: "프로필이 업데이트되었습니다." });
   } catch (error) {
-    console.error('프로필 업데이트 오류:', error);
+    console.error("프로필 업데이트 오류:", error);
     return res
       .status(500)
-      .json({ message: '프로필 업데이트 중 오류가 발생했습니다.' });
+      .json({ message: "프로필 업데이트 중 오류가 발생했습니다." });
   }
 };
 
@@ -269,51 +282,51 @@ exports.deleteUser = async (req, res) => {
   try {
     let user;
 
-    if (membershipType === 'individual') {
+    if (membershipType === "individual") {
       user = await Customer.findOne({ where: { nickname: username } });
       if (user) {
         await Customer.destroy({ where: { nickname: username } });
         console.log(`삭제됨: 일반회원 (${username})`);
-        return res.status(200).json({ message: '사용자가 탈퇴되었습니다.' });
+        return res.status(200).json({ message: "사용자가 탈퇴되었습니다." });
       }
-    } else if (membershipType === 'business') {
+    } else if (membershipType === "business") {
       user = await Owner.findOne({ where: { userid: username } });
       if (user) {
         await Owner.destroy({ where: { userid: username } });
         console.log(`삭제됨: 점주회원 (${username})`);
-        return res.status(200).json({ message: '사용자가 탈퇴되었습니다.' });
+        return res.status(200).json({ message: "사용자가 탈퇴되었습니다." });
       }
     } else {
       return res
         .status(400)
-        .json({ message: '유효하지 않은 회원 유형입니다.' });
+        .json({ message: "유효하지 않은 회원 유형입니다." });
     }
 
-    return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
+    return res.status(404).json({ message: "사용자를 찾을 수 없습니다." });
   } catch (error) {
-    console.error('사용자 탈퇴 오류:', error);
+    console.error("사용자 탈퇴 오류:", error);
     return res
       .status(500)
-      .json({ message: '사용자 탈퇴 중 오류가 발생했습니다.' });
+      .json({ message: "사용자 탈퇴 중 오류가 발생했습니다." });
   }
 };
 
 // 로그아웃
 exports.logout = (req, res) => {
-  req.session.destroy(err => {
+  req.session.destroy((err) => {
     if (err) {
       return res
         .status(500)
-        .json({ message: '로그아웃 중 오류가 발생했습니다.' });
+        .json({ message: "로그아웃 중 오류가 발생했습니다." });
     }
-    res.status(200).json({ message: '로그아웃 성공' });
+    res.status(200).json({ message: "로그아웃 성공" });
   });
 };
 
 // 로그인한 사용자 정보 가져오기
 exports.getUserProfile = async (req, res) => {
   if (!req.session.user) {
-    return res.status(401).json({ message: '로그인이 필요합니다.' });
+    return res.status(401).json({ message: "로그인이 필요합니다." });
   }
 
   const userId = req.session.user.id;
@@ -323,18 +336,18 @@ exports.getUserProfile = async (req, res) => {
     let user;
 
     // 회원 유형에 따라 적절한 테이블에서 사용자 조회
-    if (membershipType === 'individual') {
+    if (membershipType === "individual") {
       user = await Customer.findOne({ where: { id: userId } });
-    } else if (membershipType === 'business') {
+    } else if (membershipType === "business") {
       user = await Owner.findOne({ where: { id: userId } });
     }
 
     if (!user) {
-      return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
+      return res.status(404).json({ message: "사용자를 찾을 수 없습니다." });
     }
 
     return res.status(200).json({
-      message: '사용자 프로필 조회 성공',
+      message: "사용자 프로필 조회 성공",
       user: {
         id: user.id,
         name: user.name,
@@ -345,7 +358,7 @@ exports.getUserProfile = async (req, res) => {
         join_date: user.join_date,
         membershipType: user.membershipType,
         // 점주회원일 경우 추가 정보
-        ...(membershipType === 'business' && {
+        ...(membershipType === "business" && {
           businessNumber: user.businessNumber,
           ownerShopname: user.ownerShopname,
           ownerShopaddress: user.ownerShopaddress,
@@ -355,10 +368,10 @@ exports.getUserProfile = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('사용자 프로필 조회 오류:', error);
+    console.error("사용자 프로필 조회 오류:", error);
     return res
       .status(500)
-      .json({ message: '사용자 프로필 조회 중 오류가 발생했습니다.' });
+      .json({ message: "사용자 프로필 조회 중 오류가 발생했습니다." });
   }
 };
 
@@ -369,7 +382,7 @@ exports.checkPassword = async (req, res) => {
   if (!req.session.user) {
     return res
       .status(401)
-      .json({ success: false, message: '로그인이 필요합니다.' });
+      .json({ success: false, message: "로그인이 필요합니다." });
   }
 
   const userId = req.session.user.id;
@@ -379,16 +392,16 @@ exports.checkPassword = async (req, res) => {
     let user;
 
     // 회원 유형에 따라 적절한 테이블에서 사용자 조회
-    if (membershipType === 'individual') {
+    if (membershipType === "individual") {
       user = await Customer.findOne({ where: { id: userId } });
-    } else if (membershipType === 'business') {
+    } else if (membershipType === "business") {
       user = await Owner.findOne({ where: { id: userId } });
     }
 
     if (!user) {
       return res
         .status(404)
-        .json({ success: false, message: '사용자를 찾을 수 없습니다.' });
+        .json({ success: false, message: "사용자를 찾을 수 없습니다." });
     }
 
     // 비밀번호 확인
@@ -396,15 +409,15 @@ exports.checkPassword = async (req, res) => {
     if (!isMatch) {
       return res
         .status(401)
-        .json({ success: false, message: '비밀번호가 틀립니다.' });
+        .json({ success: false, message: "비밀번호가 틀립니다." });
     }
 
     return res.status(200).json({ success: true });
   } catch (error) {
-    console.error('비밀번호 확인 오류:', error);
+    console.error("비밀번호 확인 오류:", error);
     return res.status(500).json({
       success: false,
-      message: '비밀번호 확인 중 오류가 발생했습니다.',
+      message: "비밀번호 확인 중 오류가 발생했습니다.",
     });
   }
 };
