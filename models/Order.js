@@ -64,7 +64,7 @@ const Order = (sequelize, DataTypes) => {
         allowNull: false,
       },
       visitTime: {
-        type: DataTypes.DATEONLY,
+        type: DataTypes.DATE,
         allowNull: false,
       },
     },

@@ -13,10 +13,13 @@ const multerS3 = require("multer-s3");
 
 const upload = multer({ dest: "uploads/" });
 
+
+
 //-추가한 upload1로 이름을
 const upload1 = multer({
   storage: multer.memoryStorage(),
 });
+
 
 // GET /api-server
 router.get("/", controller.getIndex);
@@ -82,9 +85,14 @@ router.delete("/logout", userController.logout);
 // 현재 비밀번호 확인 라우트 추가
 router.post("/check-password", userController.checkPassword);
 
+
+router.get("/createOwner", userController.createOwners);
+router.get("/createCustomer", userController.createCustomers);
+
 //사용자 리뷰 get /api-sever/review
 router.get("/review", review.getReview);
 //사용자 리뷰 등록 post /api-sever/review
 router.post("/review", upload1.single("image"), review.postReview);
+
 
 module.exports = router;
