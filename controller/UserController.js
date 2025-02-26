@@ -1,5 +1,8 @@
 const db = require("../models");
 const bcrypt = require("bcrypt");
+
+const Shop = db.Shop;
+
 const Customer = db.Customer;
 const Owner = db.Owner;
 const Shop = db.Shop;
@@ -186,6 +189,18 @@ exports.signUp = async (req, res) => {
         isDelete: "N",
         membershipType,
       });
+      //가게 정보 등록
+      addshop = await Shop.create({
+        owner_id: newUser.id, //임시값
+        shopName: companyName,
+        businessNumber: businessRegistrationNumber,
+        shopAddress: storeAddress,
+        shopPhone: phoneNumber,
+        shopType: businessType,
+        shopOwner: representativeName,
+      });
+
+      if (addshop) console.log("회원가입 겸 가게 추가 성공");
     } else {
       return res
         .status(400)
@@ -394,6 +409,11 @@ exports.deleteUser = async (req, res) => {
         .status(400)
         .json({ message: "유효하지 않은 회원 유형입니다." });
 
+    }
+
+    return res.status(404).json({ message: "사용자를 찾을 수 없습니다." });
+
+
       if (!user) {
         // 만약 일반회원이 아니라면 비즈니스 회원도 체크
         user = await Owner.findOne({ where: { userid: nickname } }); // userid로 변경
@@ -412,6 +432,7 @@ exports.deleteUser = async (req, res) => {
 
       return res.status(404).json({ message: "사용자를 찾을 수 없습니다." });
     }
+
   } catch (error) {
     console.error("사용자 탈퇴 오류:", error);
     return res

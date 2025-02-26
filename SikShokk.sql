@@ -17,6 +17,9 @@ SHOW DATABASES;
 USE kopuragi;
 
 
+DROP TABLE 
+
+
 
 
 
@@ -79,12 +82,14 @@ INSERT INTO orderedVisitor (user_id, visitors, isTakeout, visitTime) VALUES
 
 #owner 샘플 데이터
 SELECT * FROM owner;
+TRUNCATE TABLE owner;
 INSERT INTO owner (name, nickname, userid, pw, email, phone, join_date, isDelete, businessNumber, ownerShopname, ownerShopaddress, ownerShoptype) VALUE 
 ('임진우','지누','jinu0000','aaAA11!!','jinu@naver.com','010-0000-0000', '2025-01-01', false, '1111111111','스타벅스','서울시 도봉구','카페');
 
 
 #shop 테이블 샘플 데이터
 SELECT * FROM shop;
+TRUNCATE TABLE shop;
 INSERT INTO shop (owner_id, shopName, businessNumber, shopAddress, shopPhone, shopType, shopOwner) VALUES 
 (1, '투썸플레이스','1234567890','서울시 도봉구','02-222-2222','카페','이민철');
 
