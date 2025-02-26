@@ -362,10 +362,11 @@ exports.updateUserProfile = async (req, res) => {
 
 // 사용자 탈퇴 핸들러
 exports.deleteUser = async (req, res) => {
-  const { username, membershipType } = req.params;
+  const { nickname } = req.params;
 
   try {
-    let user;
+    let user = await Customer.findOne({ where: { nickname } });
+
 
     if (membershipType === "individual") {
       user = await Customer.findOne({ where: { nickname: username } });
@@ -385,6 +386,22 @@ exports.deleteUser = async (req, res) => {
       return res
         .status(400)
         .json({ message: "유효하지 않은 회원 유형입니다." });
+
+    if (!user) {
+      // 만약 일반회원이 아니라면 비즈니스 회원도 체크
+      user = await Owner.findOne({ where: { userid: nickname } }); // userid로 변경
+      if (user) {
+        await Owner.destroy({ where: { userid: nickname } });
+        console.log(`삭제됨: 점주회원 (${nickname})`);
+        return res.status(200).json({ message: '사용자가 탈퇴되었습니다.' });
+      }
+    }
+
+    if (user) {
+      await Customer.destroy({ where: { nickname } });
+      console.log(`삭제됨: 일반회원 (${nickname})`);
+      return res.status(200).json({ message: '사용자가 탈퇴되었습니다.' });
+
     }
 
     return res.status(404).json({ message: "사용자를 찾을 수 없습니다." });
