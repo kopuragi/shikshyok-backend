@@ -1,5 +1,5 @@
 
--- Active: 1739513174980@@127.0.0.1@3306@kopuragi-- Active: 1732688612707@@127.0.0.1@3306@kopuragi-- Active: 1739513174980@@127.0.0.1@3306@kopuragi
+-- Active: 1732688637371@@127.0.0.1@3306@Kopuragi-- Active: 1739513174980@@127.0.0.1@3306@kopuragi-- Active: 1732688612707@@127.0.0.1@3306@kopuragi-- Active: 1739513174980@@127.0.0.1@3306@kopuragi
 #데이터베이스 생성
 CREATE DATABASE Kopuragi DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
 
@@ -114,3 +114,5 @@ INSERT INTO menu (shop_menu_id, menuName, price, menudesc, category) VALUES
 INSERT INTO menu (shop_menu_id, menuName, price, menudesc, category) VALUES 
 (8, '사과주스',4000,'시트러스 향이 나는 홍차','주스');
 
+
+;
