@@ -83,8 +83,13 @@ router.delete("/logout", userController.logout);
 // 현재 비밀번호 확인 라우트 추가
 router.post("/check-password", userController.checkPassword);
 
+// 점주 회원 10개, 상점 10개 생성
 router.get("/createOwner", userController.createOwners);
+
+//고객 회원 10개 생성
 router.get("/createCustomer", userController.createCustomers);
+
+//모든상점 조회
 router.get("/getShop", shopController.getShop);
 
 //사용자 리뷰 get /api-sever/review
