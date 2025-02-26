@@ -86,17 +86,6 @@ exports.signUp = async (req, res) => {
         isDelete: 'N',
         membershipType,
       });
-
-      // Shop 테이블에 정보 추가
-      await Shop.create({
-        owner_id: newUser.id, // 생성된 Owner의 ID를 외래 키로 사용
-        shopName: companyName,
-        businessNumber: businessRegistrationNumber,
-        shopAddress: storeAddress,
-        shopPhone: phoneNumber, // 선택적으로 가게 전화번호 사용
-        shopType: businessType,
-        shopOwner: representativeName, // 대표자명
-      });
     } else {
       return res
         .status(400)
