@@ -95,4 +95,8 @@ router.get("/review", review.getReview);
 router.post("/review", upload1.single("image"), review.postReview);
 
 
+//리뷰 위한 손님주문목록 조회
+router.get("/customerOrderAllHistory", review.OrderAll);
+
+
 module.exports = router;

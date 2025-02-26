@@ -241,3 +241,21 @@ exports.CusReviewDelete = async (req, res) => {
     res.status(500).json({ message: "서버 오류가 발생했습니다." });
   }
 };
+
+//----------- 회원 주문목록 전체
+exports.OrderAll = async (req, res) => {
+  try {
+    console.log(req.query);
+
+    const orderList = await Order.findAll({
+      where: { user_id: req.query.cus_id },
+    });
+
+    console.log(orderList);
+
+    res.status(200).json({ orderList });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+  }
+};
