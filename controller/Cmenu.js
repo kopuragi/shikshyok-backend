@@ -49,34 +49,31 @@ exports.getMenus = async (req, res) => {
 exports.createMenus = async (req, res) => {
   console.log("여기는 createMenus");
   console.log("이것은 req.body이다.", req.body);
-  console.log("이것은 req.session.user: ", req.session);
 
   try {
-    // const { id } = req.session.user;
-    // console.log(id);
-    // const findShopId = await Shop.findOne({
-    //   where: {
-    //     owner_id: id,
-    //   },
-    // });
-    // console.log(findShopId);
+    const owner_id = Number(req.body.owner_id);
+    console.log("이것은 id다", owner_id);
+    const findShopId = await Shop.findOne({
+      where: {
+        owner_id: owner_id,
+      },
+    });
+    console.log("이것이 findShopId", findShopId);
+    const { id } = findShopId;
+    console.log("shop의 id: ", id);
 
-    // const { shopid } = findShopId.data;
-
-    console.log("이것이 req.file", req.file);
     const decodeFile = Buffer.from(req.file.originalname, "binary").toString(
       "utf-8"
     );
-    console.log("인코딩을 하자! :", decodeFile);
-    //버전업
+
     if (req.file) {
       console.log("이것은 req.file이다.", req.file);
       const fileUrl = await uploadFile(req.file);
       const s3File = fileUrl.split("/")[3];
       const s3Url = fileUrl.split(s3File)[0];
       const insertMenus = await Menu.create({
-        // shop_menu_id: shopid, //id가 과연...
-        shop_menu_id: 2, //id가 과연...
+        shop_menu_id: shopid, //id가 과연...
+        // shop_menu_id: 2, //id가 과연...
         menuName: req.body.mname,
         price: Number(req.body.mprice),
         menudesc: req.body.mdesc,
@@ -99,15 +96,16 @@ exports.updateMenus = async (req, res) => {
   console.log(req.body);
 
   try {
-    const { userid } = req.session.user;
+    const owner_id = Number(req.body.owner_id);
+    console.log("이것은 id다", owner_id);
     const findShopId = await Shop.findOne({
       where: {
-        owner_id: userid,
+        owner_id: owner_id,
       },
     });
-    console.log(findShopId);
-
-    const { shopid } = findShopId.data;
+    console.log("이것이 findShopId", findShopId);
+    const { shopid } = findShopId;
+    console.log("shop의 id: ", id);
     const decodeFile = Buffer.from(req.file.originalname, "binary").toString(
       "utf-8"
     );
@@ -161,9 +159,10 @@ exports.deleteMenu = async (req, res) => {
 //어디다 적어놔야 하지
 exports.createShop = async (req, res) => {
   console.log("여기는 createShop");
+  const { owner_id } = req.body;
   try {
     const addshop = await Shop.create({
-      owner_id: 1, //임시값
+      owner_id: owner_id, //임시값
       shopName: req.body.sname,
       businessNumber: req.body.sbrn,
       shopAddress: req.body.saddress,
