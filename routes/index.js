@@ -15,10 +15,12 @@ const upload = multer({ dest: "uploads/" });
 
 
 
+
 //-추가한 upload1로 이름을
 const upload1 = multer({
   storage: multer.memoryStorage(),
 });
+
 
 
 // GET /api-server
@@ -86,6 +88,7 @@ router.delete("/logout", userController.logout);
 router.post("/check-password", userController.checkPassword);
 
 
+
 router.get("/createOwner", userController.createOwners);
 router.get("/createCustomer", userController.createCustomers);
 
@@ -97,6 +100,7 @@ router.post("/review", upload1.single("image"), review.postReview);
 
 //리뷰 위한 손님주문목록 조회
 router.get("/customerOrderAllHistory", review.OrderAll);
+
 
 
 module.exports = router;
