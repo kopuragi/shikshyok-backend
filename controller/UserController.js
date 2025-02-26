@@ -12,7 +12,7 @@ exports.createOwners = async (req, res) => {
 
   if (idNumber) {
     console.log(idNumber.id);
-    id = idNumber.id + 1;
+    id = idNumber.id;
     console.log(id);
   } else {
     id = 0;
@@ -73,7 +73,7 @@ exports.createCustomers = async (req, res) => {
 
   if (idNumber) {
     console.log(idNumber.id);
-    id = idNumber.id + 1;
+    id = idNumber.id;
     console.log(id);
   } else {
     id = 0;
@@ -261,7 +261,9 @@ exports.login = async (req, res) => {
           return res.status(401).json({ message: "비밀번호가 틀립니다." });
         }
 
-        console.log("세션 앞");
+        const findShop = await Shop.findOne({ where: { owner_id: user.id } });
+
+        console.log("값 확인 = ", findShop);
 
         req.session.user = {
           id: user.id,
@@ -281,6 +283,8 @@ exports.login = async (req, res) => {
           user_id: user.userid,
           type: user.membershipType,
           phone: user.phone,
+          shopId: findShop.id,
+          shopOwnerLoginId: findShop.owner_id,
         });
       }
     } catch (error) {
