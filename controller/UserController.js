@@ -5,7 +5,7 @@ const Owner = db.Owner;
 const Shop = db.Shop;
 
 //owner 회원가입 시키기 가게 등록하기
-exports.createOwners = async () => {
+exports.createOwners = async (req, res) => {
   const idNumber = await Owner.findOne({
     order: [["id", "DESC"]],
   });
@@ -27,7 +27,7 @@ exports.createOwners = async () => {
     const newOwner = await Owner.create({
       name: `ownerName${id}`,
       nickname: `ownerNickname${id}`,
-      userid: user_id,
+      userid: `owner${id}`,
       pw: hashedPassword,
       email,
       phone: `010-1234-567${id}`,
@@ -62,10 +62,11 @@ exports.createOwners = async () => {
     id++;
     console.log(`오너 생성 완료: ${user_id}`);
   }
+  res.send("오너 생성 완료");
 };
 
 //customer 회원가입 시키기
-exports.createCustomers = async () => {
+exports.createCustomers = async (req, res) => {
   const idNumber = await Customer.findOne({
     order: [["id", "DESC"]],
   });
@@ -88,10 +89,10 @@ exports.createCustomers = async () => {
       name: `고객${id}`,
       nickname: `고객닉${id}`,
       gender: "남", // 실제로 필요한 값을 넣어주세요
-      user_id: `user${id}`,
+      user_id: `customer${id}`,
       pw: hashedPassword,
       email,
-      phone: `010-1234-567${i}`,
+      phone: `010-1234-567${id}`,
       join_date: new Date().toISOString(),
       isDelete: "N",
       membershipType: "individual", // 실제로 필요한 값을 넣어주세요
@@ -99,6 +100,7 @@ exports.createCustomers = async () => {
     id++;
     console.log(`회원 생성 완료: ${user_id}`);
   }
+  res.send("회원 생성 완료");
 };
 
 // 회원가입
