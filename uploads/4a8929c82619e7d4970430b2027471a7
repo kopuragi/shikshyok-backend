@@ -1,0 +1,500 @@
+git stash apply
+git stash list
+git stash apply stash@{0}
+git stash apply stash@{0}
+git stash apply stash@{1}
+git stash apply stash@{0}
+git stash list
+git stash drop stash@{0}
+git stash list
+git add a.txt
+git commit -m "first commit"
+git stash -m "add B"
+git stash list
+git stash -m "add C"
+git stash list
+git stash apply stash@{2}
+git stash apply stash@{1}
+git stash apply stash@{0}
+git log
+git init
+git add a.txt
+git commit -m "first commit"
+git add b.txt
+git commit -m "seecond commit"
+git log
+git add c.txt
+git commit -m "third commit"
+git log
+git branch
+git branch foo
+git branch
+git checkout foo
+git add foo_d.txt 
+git commit -m "fourth commit"
+git log
+git add foo_e.txt
+git commit -m "fifth commit"
+git checkout master
+git checkout master
+git checkout foo
+git log
+git checkougit checkout master
+git checkout master
+git merge foo
+git add a.txt
+git commit -m "master commit"
+git checkout foo
+git add a.txt
+git commit -m "foo commit"
+git checkout master
+git merge foo
+git add a.txt
+git commit
+git log
+git checkout foo
+git checkout master
+git log --oneline
+git branch -d foo
+git branch
+git log
+git log --oneline
+git branch
+git branch bar
+git checkout bar
+git add bar_a.txt
+git commit -m "bar first"
+git add bar_b.txt
+git commit -m "bar second"
+git log --oneline --branches
+git checkout master
+git add d.txt
+git commit -m "ninth commit"
+git add e.txt
+git commit -m "tenth commit"
+git log --oneline --branches
+git checkout bar
+git rebase master
+git log --oneline --branches
+git log --oneline --branches --graph
+git log --oneline --branches
+git log --oneline
+git log --oneline --graph
+git log --oneline --branches --graph
+git dif e04f9c7 74195f6
+git diff master bar
+git clone https://github.com/kangtegong/collaboration.git
+git remote add git@github.com:Gominbong/test-repo.git
+git remote add https://github.com/Gominbong/test-repo.git
+git init
+git remote add https://github.com/Gominbong/test-repo.git
+git remote add git@github.com:Gominbong/test-repo.git
+git remote add origin git@github.com:Gominbong/test-repo.git
+giiiiiiitttttt   reeeeeeemote -v
+git remote -v
+git remote rename origin changed
+git remote
+git remote -v
+git remote remove changed
+git remote
+git add a.txt
+git commit -m "first commit"
+git remote add origin git@github.com:Gominbong/test-repo.git
+git branch -M main
+git push -u origin main
+git fetch
+git push -u origin main
+git pull
+rm -r .git
+ls -l
+rm -rf .git
+git init
+git remote add origin git@github.com:Gominbong/test_repo.git
+git remote
+git add a.txt
+git commit -m "first commit"
+git branch -M main
+git push -u origin main
+git commit -am "second commit"
+git push
+git log
+git fetch
+git status
+git diff main origin/main
+git checkout origin/main
+git checkout fetch_head
+git checkout FETCH_HEAD
+git log
+git checkout main
+git log --oneline
+git merge origin/main
+git log
+git log --oneline
+git log
+git log --oneline
+git pull
+git log
+git log --oneline
+git pull
+git branch add_gominbong
+git checkout add_gominbong
+ls
+vi index.html
+git add index.html
+git commit -m "add gominbong in index.html"
+git push
+git push origin add_gominbong
+git push origin add_gominbong
+git log
+git push origin add_gominbong
+git push origin add_gominbong
+remote: Permission to kangtegong/collaboration.git denied to Gominbong.
+fatal: unable to access 'https://github.com/kangtegong/collaboration.git/': The requested URL returned error: 403
+git log --oneline
+git push origin add_gominbong3
+git push origin add_gominbong
+ The requested URL retur
+git remote set-url git@github.com:Gominbong/collaboration.git
+git remote set-url origin git@github.com:Gominbong/collaboration.git
+git push origin add_gominbong
+git --help
+git commit --help
+git tag
+git init
+git config --global user.name "고민봉"
+git config --gglobal user.email "sjy2017z@naver.com"
+clear
+git config --global user.email "sjy2017z@naver.com"
+clear
+git init
+git remote add origin git@github.com:Gominbong/do_it_react.git
+clear
+gitr add .
+git add .
+git add .
+git add .
+git commit -m "리액트 프로젝트 생성후 저장소 푸시하기"
+git push -u origin master
+git log
+git init
+git config --global user.name "고민봉"
+git config --global user.email "sjy2017z@naver.com"
+git add .
+git commit -m "첫번째 커밋입니다. 66p"
+branch -M main
+git remote add origin git@github.com:Gominbong/Do_it_react.git
+git push -u origin master
+git clone git@github.com:Gominbong2/asd.git 
+git clone git@github.com:kangtegong/collaboration.git
+clear
+git branch 터미널연습브랜치
+git log --oneline
+git branch
+git checkout 터미널연습브랜치
+touch a.txt
+touch b.txt
+git checkout master
+git checkout master
+git checkout 터미널연습브랜치
+touch c.txt
+git add .
+git commit "터미널연습브랜치에서 첫번째 커밋입니다"
+git commit -m "터미널연습브랜치에서 첫번째 커밋입니다."
+git log --oneline
+git checkout master
+touch a.txt
+git merge 터미널연습브랜치
+git add .
+git commit -m "마스터에서 a.txt 파일 겹치게 만들고 커밋"
+git merge 터미널연습브랜치
+clear
+git log --oneline
+git --graph log
+git log --graph
+clear
+git branch 브랜치1생성
+git checkout 브랜치1생성
+ㅣㄴ
+lㄴ
+ㅣㄴ
+ㅣㄴ
+ls
+clear
+touch d.txt
+cat d.txt
+vi d.txt
+cat d.txt
+clear
+add d.txt
+add .
+git add d.txt
+git add .
+git add .
+clear
+git commit -m "브랜치1에서 d.txt파일추가하기"
+git checkout master
+git add .
+git commit -m "마스터브랜치에서 d.txt파일생성"
+git merge 브랜치1생성
+ls
+vi d.txt
+git add d.txt
+git commit
+clear
+ls
+cat d.txt
+git push
+git pull origin master
+ls
+git push
+clear
+touch git_bash_본체로생성
+touch 터미널git연습파일.txt
+touch 안녕 하세요 감사 합니다
+git log
+clear
+git log --oneline
+git add .
+git commit -m "터미널에서커밋하기"
+git push
+git push
+git pull
+git push
+git add .
+git commit -m "집a생성"
+git push
+ls
+clear
+ls
+clear
+touch 집b.txt
+git push
+git add .
+git commit -m "집B.txt 생성"
+git push
+git pull
+ls
+git push
+clear
+ls
+git pull
+clear
+ls
+git branch 데스크탑에서git연습
+git branch
+git branch -d 브랜치1생성
+git branch -d 터미널연습브랜치
+git branch
+git checkout git 데스크탑에서git연습
+git checkout 데스크탑에서git연습
+clear
+ls
+touch 데스크탑에서A_001.txt
+touch 데스크탑에서A_002.txt
+touch 데스크탑에서A_003.txt
+git commit -m "데스크탑에서A_001, A002, A003 생성"
+git commit -m "데스크탑에서A_001, A002, A003 생성"
+git add .
+git commit -m "데스크탑에서A_001, A002, A003 생성"
+clear
+ls
+touch 데스크탑에서B_001.txt
+touch 데스크탑에서B_002.txt
+touch 데스크탑에서B_003.txt
+git add .
+git commit -m "데스크탑에서B_001, B_002, B_003 생성 "
+touch 데스크탑에서 C_001.txt
+touch 데스크탑에서 C_002.txt
+touch 데스크탑에서 C_003.txt
+git add .
+git commit -m "데스크탑에서 C_001, c_002, C_003 생성"
+clear
+git log
+git
+clear
+git log --grahp --oneline
+git log --grhap --oneline
+git log --oneline
+clear
+git push origin 데스크탑에서git연습
+git log --oneline
+clear
+git push
+git log --oneline
+clear
+ls
+clear
+touch D_001.txt
+touch D_002.txt
+touch D_003.txt
+add .
+git add .
+git commit -m "데스크탑에서 D_001,2,3만듬"
+clear
+git push
+git push origin 데스크탑에서git연습
+git remove -v
+git remote -v
+git remote -d upstream
+git remote remove upstream
+git remote -v
+git remote remove origin
+git remote -v
+clear
+git log
+git log --oneline
+git push origin
+git push origin 데스크탑에서git연습
+clear
+git remote -v
+git remote remove orogin
+clear
+git remote add origin git@github.com:Gominbong/Do_it_react.git
+git remote -v
+clear
+git push origin 데스크탑에서git연습
+ls
+touch E_001.txt
+touch E_002.txt
+touch E_003.txt
+clear
+git add .
+git commit -m "E_001 ,2 ,3 생성"
+git push
+git push origin 데스크탑에서git연습
+git checkout master
+git merge 데스크탑에서git연습
+칟ㅁㄱ
+칟ㅁㄱ
+ㅣㄴ
+ㅣㄴ
+ㅣㄴ
+ls
+clear
+git add .
+git push origin master
+clear
+git add .
+git commit -m "마스터와 데스크탑에서git연습 브랜치 병합완료"
+clear
+ls
+git push origin master
+git push
+git remote -v
+git push origin master
+git log --oneline
+clear
+ls
+git push
+git push --set-upstream origin master
+git push --set-upstream origin master
+git pull
+git pull origin master
+clear
+git push
+git push --set-upstream origin master
+git remote -v
+git push -u origin master
+git branch
+git branch 데탑git연습1
+git checkout 데탑git연습1
+ㅣㄴ
+ㅣㄴ
+ls
+clear
+rm -rf *
+clear
+ls
+touch 데탑git연습A_001.txt
+touch 데탑git연습A_002.txt
+ls
+git add .
+git commit -m '데탑git연습1생성'
+clear
+git push origin 데탑git연습1
+ls
+clear
+git merge 데탑git연습1
+clear
+clear
+git commit -m '데탑git연습1과 master 병합완료'
+clear
+ls
+git log --oneline
+git revert -m 78edebf
+git revert 78edebf
+git revert -m 1 78edebf
+ls
+clear
+git log --oneline
+clear
+ls
+git log --oneline --graph
+git revert 78edebf
+git revert -m 78edebf
+git revert -m 2 78edebf
+ls
+git log --oneline
+git  revert c521dcc
+ls
+git reset --merge orig_head
+ls
+ls
+git branch
+git merge 데탑git연습1
+ls
+git commit -m "되돌릴머지"
+git log --oneline
+clear
+ls
+git commit -m '병합함'
+git pull
+ls
+git commit -m '병합함'
+git log --online
+git log --oneline
+clear
+ls
+git log --oneline 10
+git log --oneline -n 10
+git revert -m 1 1c5c1d9
+ls
+clear
+l;s
+ls
+git push origin master
+git clone https://github.com/1roo/gomin-pooljang.git
+git clone /c/gomin-pooljang
+git clone https://github.com/1roo/gomin-pooljang.git
+git clone https://github.com/1roo/gomin-pooljang.git
+git clone git@github.com:1roo/gomin-pooljang.git
+git clone git@github.com:Gominbong/TeamProject.git
+ls
+git clone git@github.com:Gominbong/TeamProject.git
+ssh -T $ git clone git@github.com:Gominbong/TeamProject.git
+Cloning into 'TeamProject'...
+ERROR: Repository not found.
+fatal: Could not read from remote repository.
+Please make sure you have the correct access rights
+and th
+cl;ear
+clear
+git -T git@github.com:Gominbong/TeamProject.git
+ssh -T git@github.com:Gominbong/TeamProject.git
+ssh-keygen -t rsa -b 4096 -C "sjy2017z@naver.com"
+ssh-keygen -t rsa -b 4096 -C "sjy2017z@naver.com"
+cat ~/.ssh/id_rsa.pub
+ls
+git clone 
+clear
+clear
+git clone git@github.com:Gominbong/TeamProject.git 
+ls
+clear
+git clone git@github.com:Gominbong/TeamProject.git
+clear
+git clone git@github.com:Gominbong/Sesac_TeamProject.git
+git clone git@github.com:Gominbong/spring_board_service.git
+git clone git@github.com:kopuragi/shikshyok-frontend.git
+git clone git@github.com:kopuragi/shikshyok-backend.git
+git clone git@github.com:kopuragi/shikshyok-frontend.git
