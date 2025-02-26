@@ -1,6 +1,6 @@
 const OwnerWallet = (sequelize, DataTypes) => {
   return sequelize.define(
-    'ownerWallet', // 테이블 이름을 'ownerWallet'로 설정
+    "ownerWallet", // 테이블 이름을 'ownerWallet'로 설정
     {
       id: {
         type: DataTypes.INTEGER,
@@ -11,12 +11,12 @@ const OwnerWallet = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: 'owner',
-          key: 'id',
+          model: "owner",
+          key: "id",
         },
-        unique: true,
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
+
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
       },
       totalMoney: {
         type: DataTypes.INTEGER,
@@ -43,7 +43,7 @@ const OwnerWallet = (sequelize, DataTypes) => {
     {
       timestamps: false,
       freezeTableName: true,
-    },
+    }
   );
 };
 

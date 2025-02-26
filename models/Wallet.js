@@ -1,6 +1,6 @@
 const Wallet = (sequelize, DataTypes) => {
   return sequelize.define(
-    'wallet',
+    "wallet",
     {
       id: {
         type: DataTypes.INTEGER,
@@ -11,12 +11,12 @@ const Wallet = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: 'customer',
-          key: 'id',
+          model: "customer",
+          key: "id",
         },
         unique: true,
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
       },
 
       totalMoney: {
@@ -40,7 +40,7 @@ const Wallet = (sequelize, DataTypes) => {
         allowNull: false,
       },
     },
-    { timestamps: false, freezeTableName: true },
+    { timestamps: false, freezeTableName: true }
   );
 };
 module.exports = Wallet;
