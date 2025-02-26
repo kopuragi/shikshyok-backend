@@ -63,6 +63,10 @@ exports.getMenus = async (req, res) => {
       owner_id: owner_id,
     },
   });
+
+  if (findShop.length === 0) {
+    res.send({ message: "가게 조회결과 없음" });
+  }
   console.log("이건 findShop: ", findShop[0].dataValues);
   //이 findShop 안의 id를 보내줘야 할까?
   const { id } = findShop[0].dataValues;
