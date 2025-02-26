@@ -162,11 +162,16 @@ exports.login = async (req, res) => {
           return res.status(401).json({ message: "비밀번호가 틀립니다." });
         }
 
+        console.log("세션 앞");
+
         req.session.user = {
           id: user.id,
           userid: user.userid,
           membershipType: user.membershipType,
         };
+
+        console.log(req.session.user);
+        console.log("세션 후");
 
         return res.status(200).json({
           message: "로그인 성공",
