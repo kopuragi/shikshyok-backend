@@ -72,7 +72,7 @@ exports.createMenus = async (req, res) => {
       const s3File = fileUrl.split("/")[3];
       const s3Url = fileUrl.split(s3File)[0];
       const insertMenus = await Menu.create({
-        shop_menu_id: shopid, //id가 과연...
+        shop_menu_id: id, //id가 과연...
         // shop_menu_id: 2, //id가 과연...
         menuName: req.body.mname,
         price: Number(req.body.mprice),
@@ -104,7 +104,7 @@ exports.updateMenus = async (req, res) => {
       },
     });
     console.log("이것이 findShopId", findShopId);
-    const { shopid } = findShopId;
+    const { id } = findShopId;
     console.log("shop의 id: ", id);
     const decodeFile = Buffer.from(req.file.originalname, "binary").toString(
       "utf-8"
@@ -119,7 +119,7 @@ exports.updateMenus = async (req, res) => {
       const s3Url = fileUrl.split(s3File)[0];
       const chgMenus = await Menu.update(
         {
-          shop_menu_id: shopid,
+          shop_menu_id: id,
           menuName: req.body.chgname,
           price: Number(req.body.chgprice),
           menudesc: req.body.chgdesc,
@@ -170,8 +170,11 @@ exports.createShop = async (req, res) => {
       shopType: req.body.stype,
       shopOwner: req.body.sowner,
     });
-
-    res.send({ isAdd: true });
+    if (addshop) {
+      res.send({ isAdd: true });
+    } else {
+      res.send({ isAdd: false });
+    }
   } catch (err) {
     console.log("error!!:", err);
     res.send({ isAdd: false });
