@@ -164,6 +164,10 @@ exports.login = async (req, res) => {
   if (membershipType === "business") {
     try {
       const user = await Owner.findOne({ where: { userid: user_id } });
+      //이혜민 추가
+      //user데이터의 id를 기반으로 가게를 찾아온다.
+      const yourShop = await Shop.findAll({ where: { owner_id: user.id } });
+      const { id: shopid } = yourShop[0].dataValues;
 
       if (!user) {
         return res.status(404).json({ message: "사용자를 찾을 수 없습니다." });
@@ -173,16 +177,11 @@ exports.login = async (req, res) => {
           return res.status(401).json({ message: "비밀번호가 틀립니다." });
         }
 
-        console.log("세션 앞");
-
         req.session.user = {
           id: user.id,
           userid: user.userid,
           membershipType: user.membershipType,
         };
-
-        console.log(req.session.user);
-        console.log("세션 후");
 
         return res.status(200).json({
           message: "로그인 성공",
@@ -192,6 +191,7 @@ exports.login = async (req, res) => {
           nickname: user.nickname,
           user_id: user.userid,
           type: user.membershipType,
+          shopId: shopid, //이혜민 추가
         });
       }
     } catch (error) {
