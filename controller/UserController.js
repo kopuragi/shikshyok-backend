@@ -331,96 +331,6 @@ exports.login = async (req, res) => {
         .json({ message: '로그인 중 오류가 발생했습니다.' });
     }
   }
-}; // 로그인
-exports.login = async (req, res) => {
-  const { user_id, password, membershipType } = req.body;
-
-  console.log(`로그인 요청: ${user_id}`);
-  console.log(`로그인 요청: ${membershipType} 회원`);
-
-  if (membershipType === 'individual') {
-    try {
-      const user = await Customer.findOne({ where: { user_id: user_id } });
-
-      if (!user) {
-        return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
-      } else {
-        const isMatch = await bcrypt.compare(password, user.pw);
-        if (!isMatch) {
-          return res.status(401).json({ message: '비밀번호가 틀립니다.' });
-        }
-
-        req.session.user = {
-          id: user.id,
-          userid: user.user_id,
-          membershipType: user.membershipType,
-        };
-
-        // 세션 정보 콘솔 출력
-        console.log('세션에 등록된 사용자 정보:', req.session.user);
-
-        return res.status(200).json({
-          message: '로그인 성공',
-          membershipType: user.membershipType,
-          isSuccess: true,
-          id: user.id,
-          nickname: user.nickname,
-          user_id: user.user_id,
-          type: user.membershipType,
-          phone: user.phone,
-        });
-      }
-    } catch (error) {
-      console.error('로그인 오류:', error);
-      return res
-        .status(500)
-        .json({ message: '로그인 중 오류가 발생했습니다.' });
-    }
-  }
-
-  if (membershipType === 'business') {
-    try {
-      const user = await Owner.findOne({ where: { userid: user_id } });
-
-      if (!user) {
-        return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
-      } else {
-        const isMatch = await bcrypt.compare(password, user.pw);
-        if (!isMatch) {
-          return res.status(401).json({ message: '비밀번호가 틀립니다.' });
-        }
-
-        req.session.user = {
-          id: user.id,
-          userid: user.userid,
-          membershipType: user.membershipType,
-        };
-
-        // 세션 정보 콘솔 출력
-        console.log('세션에 등록된 사용자 정보:', req.session.user);
-
-        const findShop = await Shop.findOne({ where: { owner_id: user.id } });
-
-        return res.status(200).json({
-          message: '로그인 성공',
-          membershipType: user.membershipType,
-          isSuccess: true,
-          id: user.id,
-          nickname: user.nickname,
-          user_id: user.userid,
-          type: user.membershipType,
-          phone: user.phone,
-          shopId: findShop.id,
-          shopOwnerLoginId: findShop.owner_id,
-        });
-      }
-    } catch (error) {
-      console.error('로그인 오류:', error);
-      return res
-        .status(500)
-        .json({ message: '로그인 중 오류가 발생했습니다.' });
-    }
-  }
 };
 
 // 사용자 프로필 업데이트
@@ -436,21 +346,21 @@ exports.updateUserProfile = async (req, res) => {
     address,
     companyName,
     businessType,
-
+    userid,
     storeAddress,
     representativeName,
     businessRegistrationNumber,
     membershipType,
   } = req.body;
-
+  console.log('req.body:', req.body);
   try {
     let user;
-
+    console.log('userid:', userid);
     if (membershipType === 'individual') {
-      user = await Customer.findOne({ where: { nickname } });
+      user = await Customer.findOne({ where: { user_id: userid } });
     } else if (membershipType === 'business') {
       user = await Owner.findOne({
-        where: { userid: req.session.user.user_id },
+        where: { userid: userid },
       });
     } else {
       return res
@@ -542,50 +452,27 @@ exports.logout = (req, res) => {
   });
 };
 
-// 로그인한 사용자 정보 가져오기
+// 사용자 정보 불러오기기
 exports.getLoggedInUserProfile = async (req, res) => {
-  // 세션에 사용자 정보가 있는지 확인
-  if (!req.session.user) {
-    return res.status(401).json({ message: '로그인이 필요합니다.' });
-  }
-
-  const userId = req.session.user.id;
-  const membershipType = req.session.user.membershipType;
-
+  const { type, userId } = req.query;
+  console.log('type : ', type);
+  console.log('userId : ', userId);
   try {
     let user;
 
     // 회원 유형에 따라 적절한 테이블에서 사용자 조회
-    if (membershipType === 'individual') {
-      user = await Customer.findOne({ where: { id: userId } });
-    } else if (membershipType === 'business') {
-      user = await Owner.findOne({ where: { id: userId } });
+    if (type === 'individual') {
+      user = await Customer.findOne({ where: { user_id: userId } });
+    } else if (type === 'business') {
+      user = await Owner.findOne({ where: { userid: userId } });
     }
-
+    console.log('user :', user);
     if (!user) {
+      console.error(
+        `사용자 ID ${userId}에 해당하는 사용자를 찾을 수 없습니다.`,
+      );
       return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
     }
-
-    return res.status(200).json({
-      message: '사용자 프로필 조회 성공',
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        gender: user.gender,
-        address: user.address,
-        join_date: user.join_date,
-        membershipType: user.membershipType,
-        ...(membershipType === 'business' && {
-          businessNumber: user.businessNumber,
-          ownerShopname: user.ownerShopname,
-          ownerShopaddress: user.ownerShopaddress,
-          ownerShoptype: user.ownerShoptype,
-          representativeName: user.representativeName,
-        }),
-      },
-    });
   } catch (error) {
     console.error('사용자 프로필 조회 오류:', error);
     return res
