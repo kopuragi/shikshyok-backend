@@ -1,7 +1,110 @@
 const db = require('../models');
 const bcrypt = require('bcrypt');
+
 const Customer = db.Customer;
 const Owner = db.Owner;
+const Shop = db.Shop;
+const Wallet = db.Wallet;
+const OwnerWallet = db.OwnerWallet;
+
+//owner 회원가입 시키기 가게 등록하기
+exports.createOwners = async (req, res) => {
+  const idNumber = await Owner.findOne({
+    order: [['id', 'DESC']],
+  });
+
+  if (idNumber) {
+    console.log(idNumber.id);
+    id = idNumber.id;
+    console.log(id);
+  } else {
+    id = 0;
+  }
+
+  for (let i = 0; i < 10; i++) {
+    const user_id = `owner${id.toString().padStart(2, '0')}`;
+    const email = `owner${id}@example.com`;
+    const password = '1234'; // 여기에 실제 비밀번호를 넣어주세요
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newOwner = await Owner.create({
+      name: `ownerName${id}`,
+      nickname: `ownerNickname${id}`,
+      userid: `owner${id}`,
+      pw: hashedPassword,
+      email,
+      phone: `010-1234-567${id}`,
+      businessNumber: `123-45-678${id}`,
+      ownerShopname: `치킨킨${id}`,
+      ownerShopaddress: `도봉구${id}`,
+      ownerShoptype: '한식', // 실제로 필요한 값을 넣어주세요
+      representativeName: `대표${id}`,
+      join_date: new Date().toISOString(),
+      isDelete: 'N',
+      membershipType: 'business', // 실제로 필요한 값을 넣어주세요
+    });
+
+    const newShop = await Shop.create({
+      // owner_id
+      // shopName
+      // businessNumber
+      // shopAddress
+      // shopPhone
+      // shopType
+      // shopOwner
+
+      owner_id: newOwner.id,
+      shopName: `치킨킨${id}`,
+      businessNumber: `123-45-678${id}`,
+      shopAddress: `도봉구${id}`,
+      shopPhone: `010-1234-567${id}`,
+      shopType: '한식',
+      shopOwner: `ownerName${id}`,
+    });
+
+    id++;
+    console.log(`오너 생성 완료: ${user_id}`);
+  }
+  res.send('오너 생성 완료');
+};
+
+//customer 회원가입 시키기
+exports.createCustomers = async (req, res) => {
+  const idNumber = await Customer.findOne({
+    order: [['id', 'DESC']],
+  });
+
+  if (idNumber) {
+    console.log(idNumber.id);
+    id = idNumber.id;
+    console.log(id);
+  } else {
+    id = 0;
+  }
+
+  for (let i = 0; i < 10; i++) {
+    const user_id = `customer${id.toString().padStart(2, '0')}`;
+    const email = `customer${id}@example.com`;
+    const password = '1234'; // 여기에 실제 비밀번호를 넣어주세요
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = await Customer.create({
+      name: `고객${id}`,
+      nickname: `고객닉${id}`,
+      gender: '남', // 실제로 필요한 값을 넣어주세요
+      user_id: `customer${id}`,
+      pw: hashedPassword,
+      email,
+      phone: `010-1234-567${id}`,
+      join_date: new Date().toISOString(),
+      isDelete: 'N',
+      membershipType: 'individual', // 실제로 필요한 값을 넣어주세요
+    });
+    id++;
+    console.log(`회원 생성 완료: ${user_id}`);
+  }
+  res.send('회원 생성 완료');
+};
 
 // 회원가입
 exports.signUp = async (req, res) => {
@@ -56,6 +159,16 @@ exports.signUp = async (req, res) => {
         isDelete: 'N',
         membershipType,
       });
+
+      // Wallet 생성
+      await Wallet.create({
+        customer_id: newUser.id, // 사용자 ID
+        totalMoney: 0, // 초기 총 금액
+        chargedMoney: 0, // 초기 충전 금액
+        chargeTime: new Date(), // 현재 시간으로 초기 충전 시간 설정
+        withdrawMoney: 0, // 초기 인출 금액
+        withdrawTime: new Date(), // 현재 시간으로 초기 인출 시간 설정
+      });
     } else if (membershipType === 'business') {
       const existingOwner = await Owner.findOne({ where: { userid: user_id } });
       if (existingOwner)
@@ -86,6 +199,29 @@ exports.signUp = async (req, res) => {
         isDelete: 'N',
         membershipType,
       });
+
+      // OwnerWallet 생성
+      await OwnerWallet.create({
+        owner_id: newUser.id, // 점주 ID
+        totalMoney: 0, // 초기 총 금액
+        chargedMoney: 0, // 초기 충전 금액
+        chargeTime: new Date(), // 현재 시간으로 초기 충전 시간 설정
+        withdrawMoney: 0, // 초기 인출 금액
+        withdrawTime: new Date(), // 현재 시간으로 초기 인출 시간 설정
+      });
+
+      // 가게 정보 등록
+      const addshop = await Shop.create({
+        owner_id: newUser.id, // 점주 ID
+        shopName: companyName,
+        businessNumber: businessRegistrationNumber,
+        shopAddress: storeAddress,
+        shopPhone: phoneNumber,
+        shopType: businessType,
+        shopOwner: representativeName,
+      });
+
+      if (addshop) console.log('회원가입 겸 가게 추가 성공');
     } else {
       return res
         .status(400)
@@ -130,6 +266,9 @@ exports.login = async (req, res) => {
           membershipType: user.membershipType,
         };
 
+        // 세션 정보 콘솔 출력
+        console.log('세션에 등록된 사용자 정보:', req.session.user);
+
         return res.status(200).json({
           message: '로그인 성공',
           membershipType: user.membershipType,
@@ -138,6 +277,7 @@ exports.login = async (req, res) => {
           nickname: user.nickname,
           user_id: user.user_id,
           type: user.membershipType,
+          phone: user.phone,
         });
       }
     } catch (error) {
@@ -160,16 +300,16 @@ exports.login = async (req, res) => {
           return res.status(401).json({ message: '비밀번호가 틀립니다.' });
         }
 
-        console.log("세션 앞");
-
         req.session.user = {
           id: user.id,
           userid: user.userid,
           membershipType: user.membershipType,
         };
 
-        console.log(req.session.user);
-        console.log("세션 후");
+        // 세션 정보 콘솔 출력
+        console.log('세션에 등록된 사용자 정보:', req.session.user);
+
+        const findShop = await Shop.findOne({ where: { owner_id: user.id } });
 
         return res.status(200).json({
           message: '로그인 성공',
@@ -179,6 +319,99 @@ exports.login = async (req, res) => {
           nickname: user.nickname,
           user_id: user.userid,
           type: user.membershipType,
+          phone: user.phone,
+          shopId: findShop.id,
+          shopOwnerLoginId: findShop.owner_id,
+        });
+      }
+    } catch (error) {
+      console.error('로그인 오류:', error);
+      return res
+        .status(500)
+        .json({ message: '로그인 중 오류가 발생했습니다.' });
+    }
+  }
+}; // 로그인
+exports.login = async (req, res) => {
+  const { user_id, password, membershipType } = req.body;
+
+  console.log(`로그인 요청: ${user_id}`);
+  console.log(`로그인 요청: ${membershipType} 회원`);
+
+  if (membershipType === 'individual') {
+    try {
+      const user = await Customer.findOne({ where: { user_id: user_id } });
+
+      if (!user) {
+        return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
+      } else {
+        const isMatch = await bcrypt.compare(password, user.pw);
+        if (!isMatch) {
+          return res.status(401).json({ message: '비밀번호가 틀립니다.' });
+        }
+
+        req.session.user = {
+          id: user.id,
+          userid: user.user_id,
+          membershipType: user.membershipType,
+        };
+
+        // 세션 정보 콘솔 출력
+        console.log('세션에 등록된 사용자 정보:', req.session.user);
+
+        return res.status(200).json({
+          message: '로그인 성공',
+          membershipType: user.membershipType,
+          isSuccess: true,
+          id: user.id,
+          nickname: user.nickname,
+          user_id: user.user_id,
+          type: user.membershipType,
+          phone: user.phone,
+        });
+      }
+    } catch (error) {
+      console.error('로그인 오류:', error);
+      return res
+        .status(500)
+        .json({ message: '로그인 중 오류가 발생했습니다.' });
+    }
+  }
+
+  if (membershipType === 'business') {
+    try {
+      const user = await Owner.findOne({ where: { userid: user_id } });
+
+      if (!user) {
+        return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
+      } else {
+        const isMatch = await bcrypt.compare(password, user.pw);
+        if (!isMatch) {
+          return res.status(401).json({ message: '비밀번호가 틀립니다.' });
+        }
+
+        req.session.user = {
+          id: user.id,
+          userid: user.userid,
+          membershipType: user.membershipType,
+        };
+
+        // 세션 정보 콘솔 출력
+        console.log('세션에 등록된 사용자 정보:', req.session.user);
+
+        const findShop = await Shop.findOne({ where: { owner_id: user.id } });
+
+        return res.status(200).json({
+          message: '로그인 성공',
+          membershipType: user.membershipType,
+          isSuccess: true,
+          id: user.id,
+          nickname: user.nickname,
+          user_id: user.userid,
+          type: user.membershipType,
+          phone: user.phone,
+          shopId: findShop.id,
+          shopOwnerLoginId: findShop.owner_id,
         });
       }
     } catch (error) {
@@ -203,6 +436,7 @@ exports.updateUserProfile = async (req, res) => {
     address,
     companyName,
     businessType,
+
     storeAddress,
     representativeName,
     businessRegistrationNumber,
@@ -264,29 +498,27 @@ exports.updateUserProfile = async (req, res) => {
 
 // 사용자 탈퇴 핸들러
 exports.deleteUser = async (req, res) => {
-  const { username, membershipType } = req.params;
+  const { nickname } = req.params; // URL에서 닉네임 가져오기
+
+  if (!nickname) {
+    return res.status(400).json({ message: '닉네임이 필요합니다.' });
+  }
 
   try {
-    let user;
+    // 사용자 조회 (일반회원과 점주회원 모두)
+    const customer = await Customer.findOne({ where: { nickname } });
+    const owner = await Owner.findOne({ where: { nickname } });
 
-    if (membershipType === 'individual') {
-      user = await Customer.findOne({ where: { nickname: username } });
-      if (user) {
-        await Customer.destroy({ where: { nickname: username } });
-        console.log(`삭제됨: 일반회원 (${username})`);
-        return res.status(200).json({ message: '사용자가 탈퇴되었습니다.' });
-      }
-    } else if (membershipType === 'business') {
-      user = await Owner.findOne({ where: { userid: username } });
-      if (user) {
-        await Owner.destroy({ where: { userid: username } });
-        console.log(`삭제됨: 점주회원 (${username})`);
-        return res.status(200).json({ message: '사용자가 탈퇴되었습니다.' });
-      }
-    } else {
-      return res
-        .status(400)
-        .json({ message: '유효하지 않은 회원 유형입니다.' });
+    if (customer) {
+      await Customer.destroy({ where: { nickname } });
+      console.log(`삭제됨: 일반회원 (${nickname})`);
+      return res.status(200).json({ message: '사용자가 탈퇴되었습니다.' });
+    }
+
+    if (owner) {
+      await Owner.destroy({ where: { nickname } });
+      console.log(`삭제됨: 점주회원 (${nickname})`);
+      return res.status(200).json({ message: '사용자가 탈퇴되었습니다.' });
     }
 
     return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
@@ -311,7 +543,8 @@ exports.logout = (req, res) => {
 };
 
 // 로그인한 사용자 정보 가져오기
-exports.getUserProfile = async (req, res) => {
+exports.getLoggedInUserProfile = async (req, res) => {
+  // 세션에 사용자 정보가 있는지 확인
   if (!req.session.user) {
     return res.status(401).json({ message: '로그인이 필요합니다.' });
   }
@@ -344,7 +577,6 @@ exports.getUserProfile = async (req, res) => {
         address: user.address,
         join_date: user.join_date,
         membershipType: user.membershipType,
-        // 점주회원일 경우 추가 정보
         ...(membershipType === 'business' && {
           businessNumber: user.businessNumber,
           ownerShopname: user.ownerShopname,

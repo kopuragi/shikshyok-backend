@@ -14,6 +14,7 @@ const s3 = new S3Client({
 });
 
 //버전업
+
 const uploadFile = async (file) => {
   try {
     const fileContent = fs.readFileSync(file.path); // 파일 경로
@@ -40,50 +41,64 @@ const uploadFile = async (file) => {
 //버전업 끝
 
 exports.getMenus = async (req, res) => {
-  console.log("여기는 getMenus");
-  const findMenus = await Menu.findAll();
-  console.log("메뉴 조회!");
-  res.send(findMenus);
+  const { shopId, owner_id } = req.query;
+
+  if (shopId) {
+    const findMenus = await Menu.findAll({
+      where: {
+        shop_menu_id: shopId,
+      },
+    });
+    res.send(findMenus);
+  }
 };
 
 exports.createMenus = async (req, res) => {
-  console.log("여기는 createMenus");
-  console.log("이것은 req.body이다.", req.body);
+  const { shopId } = req.body;
 
   try {
-    const owner_id = Number(req.body.owner_id);
-    console.log("이것은 id다", owner_id);
-    const findShopId = await Shop.findOne({
-      where: {
-        owner_id: owner_id,
-      },
-    });
-    console.log("이것이 findShopId", findShopId);
-    const { id } = findShopId;
-    console.log("shop의 id: ", id);
+    if (shopId) {
+      const shopId = Number(req.body.shopId);
 
-    const decodeFile = Buffer.from(req.file.originalname, "binary").toString(
-      "utf-8"
-    );
-
-    if (req.file) {
-      console.log("이것은 req.file이다.", req.file);
-      const fileUrl = await uploadFile(req.file);
-      const s3File = fileUrl.split("/")[3];
-      const s3Url = fileUrl.split(s3File)[0];
-      const insertMenus = await Menu.create({
-        shop_menu_id: id, //id가 과연...
-        // shop_menu_id: 2, //id가 과연...
-        menuName: req.body.mname,
-        price: Number(req.body.mprice),
-        menudesc: req.body.mdesc,
-        category: req.body.mcategory,
-        originMfile: decodeFile,
-        saveMfile: encodeURIComponent(s3File),
-      });
-      res.send({ insertMenus, isUpdate: true, s3Url });
+      if (req.file) {
+        const decodeFile = Buffer.from(
+          req.file.originalname,
+          "binary"
+        ).toString("utf-8");
+        const fileUrl = await uploadFile(req.file);
+        const s3File = fileUrl.split("/")[3];
+        const s3Url = fileUrl.split(s3File)[0];
+        const insertMenus = await Menu.create({
+          shop_menu_id: shopId,
+          menuName: req.body.mname,
+          price: Number(req.body.mprice),
+          menudesc: req.body.mdesc,
+          category: req.body.mcategory,
+          originMfile: decodeFile,
+          saveMfile: encodeURIComponent(s3File),
+        });
+        res.send({
+          insertMenus,
+          isUpdate: true,
+          s3Url,
+          msg: "등록이 완료됐습니다.",
+        });
+      } else if (!req.file) {
+        const insertMenus = await Menu.create({
+          shop_menu_id: shopId,
+          menuName: req.body.mname,
+          price: Number(req.body.mprice),
+          menudesc: req.body.mdesc,
+          category: req.body.mcategory,
+        });
+        res.send({
+          insertMenus,
+          isUpdate: true,
+          msg: "등록이 완료됐습니다.",
+        });
+      }
     } else {
-      res.send({ isUpdate: false });
+      res.send({ isUpdate: false, msg: "shopId가 없습니다." });
     }
   } catch (err) {
     console.log("err!:", err);
@@ -92,34 +107,23 @@ exports.createMenus = async (req, res) => {
 
 //메뉴 정보 수정
 exports.updateMenus = async (req, res) => {
-  console.log("여기는 updateMenus");
-  console.log(req.body);
-
+  console.log(Boolean(req.file));
   try {
-    const owner_id = Number(req.body.owner_id);
-    console.log("이것은 id다", owner_id);
-    const findShopId = await Shop.findOne({
-      where: {
-        owner_id: owner_id,
-      },
-    });
-    console.log("이것이 findShopId", findShopId);
-    const { id } = findShopId;
-    console.log("shop의 id: ", id);
-    const decodeFile = Buffer.from(req.file.originalname, "binary").toString(
-      "utf-8"
-    );
-    console.log("인코딩을 하자! :", decodeFile);
+    const { shopId } = req.body;
+
     //버전업
     if (req.file) {
       console.log("이것은 req.file이다.", req.file);
+      const decodeFile = Buffer.from(req.file.originalname, "binary").toString(
+        "utf-8"
+      );
       const fileUrl = await uploadFile(req.file);
       console.log(fileUrl);
       const s3File = fileUrl.split("/")[3];
       const s3Url = fileUrl.split(s3File)[0];
       const chgMenus = await Menu.update(
         {
-          shop_menu_id: id,
+          shop_menu_id: Number(shopId),
           menuName: req.body.chgname,
           price: Number(req.body.chgprice),
           menudesc: req.body.chgdesc,
@@ -129,11 +133,28 @@ exports.updateMenus = async (req, res) => {
         },
         {
           where: {
-            id: req.body.id,
+            id: Number(req.body.menuid),
           },
         }
       );
       res.send({ chgMenus, isUpdate: true, s3Url });
+    } else if (!req.file) {
+      console.log("여기는 update 내의 if문. else 내부.");
+      const chgMenus = await Menu.update(
+        {
+          shop_menu_id: Number(shopId),
+          menuName: req.body.chgname,
+          price: Number(req.body.chgprice),
+          menudesc: req.body.chgdesc,
+          category: req.body.chgcategory,
+        },
+        {
+          where: {
+            id: Number(req.body.menuid),
+          },
+        }
+      );
+      res.send({ chgMenus, isUpdate: true });
     }
   } catch (err) {
     console.log("err", err);
@@ -142,8 +163,7 @@ exports.updateMenus = async (req, res) => {
 
 exports.deleteMenu = async (req, res) => {
   try {
-    console.log(req.body);
-    const throwMenu = await Menu.destroy({
+    throwMenu = await Menu.destroy({
       where: {
         id: req.body.id,
       },
@@ -157,26 +177,25 @@ exports.deleteMenu = async (req, res) => {
 
 //가게 등록 컨트롤러
 //어디다 적어놔야 하지
-exports.createShop = async (req, res) => {
-  console.log("여기는 createShop");
-  const { owner_id } = req.body;
-  try {
-    const addshop = await Shop.create({
-      owner_id: owner_id, //임시값
-      shopName: req.body.sname,
-      businessNumber: req.body.sbrn,
-      shopAddress: req.body.saddress,
-      shopPhone: req.body.sphone,
-      shopType: req.body.stype,
-      shopOwner: req.body.sowner,
-    });
-    if (addshop) {
-      res.send({ isAdd: true });
-    } else {
-      res.send({ isAdd: false });
-    }
-  } catch (err) {
-    console.log("error!!:", err);
-    res.send({ isAdd: false });
-  }
-};
+// exports.createShop = async (req, res) => {
+//   const { owner_id } = req.body;
+//   try {
+//     const addshop = await Shop.create({
+//       owner_id: owner_id, //임시값
+//       shopName: req.body.sname,
+//       businessNumber: req.body.sbrn,
+//       shopAddress: req.body.saddress,
+//       shopPhone: req.body.sphone,
+//       shopType: req.body.stype,
+//       shopOwner: req.body.sowner,
+//     });
+//     if (addshop) {
+//       res.send({ isAdd: true });
+//     } else {
+//       res.send({ isAdd: false });
+//     }
+//   } catch (err) {
+//     console.log("error!!:", err);
+//     res.send({ isAdd: false });
+//   }
+// };

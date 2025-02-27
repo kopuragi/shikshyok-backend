@@ -34,8 +34,10 @@ app.use(
 );
 
 const corsOptions = {
+
   origin: ["http://localhost:3000", "http://43.203.244.227"], // 허용할 도메인
-  methods: ["GET", "POST", "PUT", "DELETE"], // 허용할 메소드
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], // 허용할 메소드
+
   credentials: true, // 자격 증명 허용
 };
 

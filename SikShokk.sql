@@ -1,5 +1,6 @@
 
--- Active: 1732688612707@@127.0.0.1@3306@kopuragi-- Active: 1739513174980@@127.0.0.1@3306@kopuragi-- Active: 1732688612707@@127.0.0.1@3306@kopuragi-- Active: 1739513174980@@127.0.0.1@3306@kopuragi
+-- Active: 1732688637371@@127.0.0.1@3306@Kopuragi-- Active: 1739513174980@@127.0.0.1@3306@kopuragi-- Active: 1732688612707@@127.0.0.1@3306@kopuragi-- Active: 1739513174980@@127.0.0.1@3306@kopuragi
+
 #데이터베이스 생성
 CREATE DATABASE Kopuragi DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
 
@@ -15,6 +16,9 @@ GRANT ALL PRIVILEGES ON *.* TO 'shikshokk'@'%' WITH GRANT OPTION;
 #계정이 제대로 생성되었는지 확인
 SHOW DATABASES;
 USE kopuragi;
+
+
+DROP TABLE 
 
 
 
@@ -81,12 +85,15 @@ INSERT INTO orderedVisitor (user_id, visitors, isTakeout, visitTime, shop_order_
 
 #owner 샘플 데이터
 SELECT * FROM owner;
+TRUNCATE TABLE owner;
 INSERT INTO owner (name, nickname, userid, pw, email, phone, join_date, isDelete, businessNumber, ownerShopname, ownerShopaddress, ownerShoptype) VALUE 
 ('임진우','지누','jinu0000','aaAA11!!','jinu@naver.com','010-0000-0000', '2025-01-01', false, '1111111111','스타벅스','서울시 도봉구','카페');
 
 
 #shop 테이블 샘플 데이터
 SELECT * FROM shop;
+DESC shop;
+TRUNCATE TABLE shop;
 INSERT INTO shop (owner_id, shopName, businessNumber, shopAddress, shopPhone, shopType, shopOwner) VALUES 
 (1, '투썸플레이스','1234567890','서울시 도봉구','02-222-2222','카페','이민철');
 
@@ -116,14 +123,4 @@ INSERT INTO menu (shop_menu_id, menuName, price, menudesc, category) VALUES
 INSERT INTO menu (shop_menu_id, menuName, price, menudesc, category) VALUES 
 (8, '사과주스',4000,'시트러스 향이 나는 홍차','주스');
 
--- 더미 데이터 삽입
-INSERT INTO `order` (cus_order_id, shop_order_id, user_id, menuName, price, totalPrice, visitors, isTakeout, orderTime, `option`, progress, visitTime) VALUES
-(1, 101, 'user01', '치킨', '15000', '45000', 3, 0, '2025-02-27 12:30:00', '추가 치즈', '수락', '2025-02-28'),
-(2, 102, 'user02', '피자', '12000', '12000', 1, 1, '2025-02-27 13:00:00', '매운맛', '진행 중', '2025-02-28'),
-(3, 103, 'user03', '햄버거', '20000', '60000', 3, 0, '2025-02-27 14:15:00', '사이드 감자 추가', '완료', '2025-02-28'),
-(4, 104, 'user04', '돈까스', '18000', '36000', 2, 1, '2025-02-27 15:45:00', '콜라 추가', '거절', '2025-02-28'),
-(5, 105, 'user05', '떡볶이', '25000', '50000', 2, 0, '2025-02-27 17:10:00', '치즈볼 추가', '수락', '2025-02-28'),
-(6, 106, 'user06', '김밥', '17000', '34000', 2, 1, '2025-02-27 18:20:00', '고구마 피자 변경', '진행 중', '2025-02-28'),
-(7, 107, 'user07', '칼국수', '13000', '26000', 2, 0, '2025-02-27 19:05:00', '추가 소스', '완료', '2025-02-28'),
-(8, 108, 'user08', '라면', '14000', '28000', 2, 1, '2025-02-27 20:30:00', '사이드 샐러드 추가', '거절', '2025-02-28');
 
