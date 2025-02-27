@@ -92,6 +92,8 @@ router.get("/createCustomer", userController.createCustomers);
 //모든상점 조회
 router.get("/getShop", shopController.getShop);
 
+router.get("/getOwner/:shopLoginId", shopController.getOwner);
+
 //사용자 리뷰 get /api-sever/review
 router.get("/review", review.getReview);
 //사용자 리뷰 등록 post /api-sever/review
