@@ -246,13 +246,11 @@ exports.CusReviewDelete = async (req, res) => {
 exports.OrderAll = async (req, res) => {
   try {
     console.log(req.query);
-
     const orderList = await Order.findAll({
       where: { user_id: req.query.cus_id },
     });
 
     console.log(orderList);
-
     res.status(200).json({ orderList });
   } catch (err) {
     console.error(err);
