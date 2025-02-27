@@ -29,7 +29,7 @@ const Order = (sequelize, DataTypes) => {
       },
       user_id: {
         type: DataTypes.STRING(255),
-        allowNull: false,
+        allowNull: true,
       },
       menuName: {
         type: DataTypes.STRING(255),
