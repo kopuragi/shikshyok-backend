@@ -16,7 +16,7 @@
   "production": {
     "username": "admin",
     "password": "wlsdn1234",
-    "database": "sesac",
+    "database": "shik",
     "host": "rds-test.c3g4m6my8c1t.ap-northeast-2.rds.amazonaws.com",
     "dialect": "mysql"
   }
