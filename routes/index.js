@@ -60,7 +60,7 @@ router.patch("/menu-change", upload.single("image"), menu.updateMenus);
 router.delete("/menu-delete", menu.deleteMenu);
 
 //POST /api-server/shop-register
-router.post("/shop-register", menu.createShop);
+// router.post("/shop-register", menu.createShop);
 
 // 회원가입
 router.post("/signup", userController.signUp);

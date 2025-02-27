@@ -278,11 +278,9 @@ exports.login = async (req, res) => {
           return res.status(401).json({ message: "비밀번호가 틀립니다." });
         }
 
-
         const findShop = await Shop.findOne({ where: { owner_id: user.id } });
 
         console.log("값 확인 = ", findShop);
-
 
         req.session.user = {
           id: user.id,
@@ -298,11 +296,9 @@ exports.login = async (req, res) => {
           nickname: user.nickname,
           user_id: user.userid,
           type: user.membershipType,
-
           phone: user.phone,
           shopId: findShop.id,
           shopOwnerLoginId: findShop.owner_id,
-
         });
       }
     } catch (error) {

@@ -89,6 +89,7 @@ INSERT INTO owner (name, nickname, userid, pw, email, phone, join_date, isDelete
 
 #shop 테이블 샘플 데이터
 SELECT * FROM shop;
+DESC shop;
 TRUNCATE TABLE shop;
 INSERT INTO shop (owner_id, shopName, businessNumber, shopAddress, shopPhone, shopType, shopOwner) VALUES 
 (1, '투썸플레이스','1234567890','서울시 도봉구','02-222-2222','카페','이민철');
