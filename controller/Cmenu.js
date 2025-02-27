@@ -45,6 +45,7 @@ exports.getMenus = async (req, res) => {
 
   const { shopId, owner_id } = req.query;
 
+
   if (shopId) {
     const findMenus = await Menu.findAll({
       where: {
@@ -54,6 +55,7 @@ exports.getMenus = async (req, res) => {
     console.log("메뉴 조회!");
     res.send(findMenus);
   }
+
 };
 
 exports.createMenus = async (req, res) => {
