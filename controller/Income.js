@@ -2,7 +2,8 @@ const db = require("../models");
 const { OrderedMenu, Order, Sequelize, OrderedVisitor } = db;
 const { Op, fn, col } = require("sequelize");
 exports.orderMenu = async (req, res) => {
-  const { startDate, endDate } = req.body;
+  const { startDate, endDate, shopId } = req.body;
+  console.log(shopId);
   try {
     const result = await OrderedMenu.findAll({
       where: {
@@ -10,6 +11,7 @@ exports.orderMenu = async (req, res) => {
           [Sequelize.Op.gte]: new Date(startDate),
           [Sequelize.Op.lt]: new Date(endDate),
         },
+        shop_order_id: shopId,
       },
       attributes: [
         "visitTime",
@@ -77,7 +79,7 @@ exports.orderMenu = async (req, res) => {
 
 exports.orderVisitor = async (req, res) => {
   try {
-    const { startDate, endDate } = req.body;
+    const { startDate, endDate, shopId } = req.body;
 
     const result = await OrderedVisitor.findAll({
       where: {
@@ -85,6 +87,7 @@ exports.orderVisitor = async (req, res) => {
           [Op.gte]: new Date(startDate),
           [Op.lte]: new Date(endDate),
         },
+        shop_order_id: shopId,
       },
       attributes: [
         "visitTime",
@@ -130,13 +133,14 @@ exports.orderVisitor = async (req, res) => {
 
 exports.reVisitor = async (req, res) => {
   try {
-    const { startDate, endDate } = req.body;
+    const { startDate, endDate, shopId } = req.body;
     const result = await OrderedVisitor.findAll({
       where: {
         visitTime: {
           [Sequelize.Op.gte]: new Date(startDate),
           [Sequelize.Op.lt]: new Date(endDate),
         },
+        shop_order_id: shopId,
       },
       attributes: ["user_id", "visitors", "visitTime"],
       include: [{ model: Order, attributes: [] }],
