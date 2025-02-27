@@ -6,6 +6,7 @@ const review = require("../controller/Review");
 const menu = require("../controller/Cmenu");
 const userController = require("../controller/UserController");
 const shopController = require("../controller/ShopController");
+const orderController = require("../controller/OrderController");
 //s3설정
 const multer = require("multer");
 const aws = require("aws-sdk");
@@ -93,6 +94,8 @@ router.get("/createCustomer", userController.createCustomers);
 router.get("/getShop", shopController.getShop);
 
 router.get("/getOwner/:shopLoginId", shopController.getOwner);
+
+router.post("/addOrder", orderController.addOrder);
 
 //사용자 리뷰 get /api-sever/review
 router.get("/review", review.getReview);
