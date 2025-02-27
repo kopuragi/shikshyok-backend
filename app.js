@@ -34,8 +34,10 @@ app.use(
 );
 
 const corsOptions = {
-  origin: "http://localhost:3000", // 허용할 도메인
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], // 허용할 메소드 PATCH 추가
+
+  origin: ["http://localhost:3000", "http://43.203.244.227"], // 허용할 도메인
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], // 허용할 메소드
+
   credentials: true, // 자격 증명 허용
 };
 
@@ -80,6 +82,7 @@ const cookingCompletedCustomerStorage = {
     "주문번호가 키임": "12345678-5be4-4fcf-9e9b-d164a3a0ff2d",
   },
 };
+
 const orderApprovedCustomerStorage = {
   onwer: {
     "주문번호가 키임": "12345678-5be4-4fcf-9e9b-d164a3a0ff2d",
