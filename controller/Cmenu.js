@@ -44,6 +44,9 @@ exports.getMenus = async (req, res) => {
   console.log(req.query);
 
   const { shopId, owner_id } = req.query;
+
+  console.log("이것은 shopId", shopId);
+  console.log("이것은 owner_id", owner_id);
   //스타벅스(서브 가게)에 메뉴를 추가하고 나면 shopId가 전달되지 않는다.
   //좀 더 정확히는, shopId가 텅 비어있는 상태다. undefined
   //그렇다면, Menus 페이지에 있는 crossId가 undefined가 된다는 뜻.
@@ -60,6 +63,10 @@ exports.getMenus = async (req, res) => {
       owner_id: owner_id,
     },
   });
+
+  if (findShop.length === 0) {
+    res.send({ message: "가게 조회결과 없음" });
+  }
   console.log("이건 findShop: ", findShop[0].dataValues);
   //이 findShop 안의 id를 보내줘야 할까?
   const { id } = findShop[0].dataValues;
