@@ -41,7 +41,7 @@ const uploadFile = async (file) => {
 //버전업 끝
 
 exports.getMenus = async (req, res) => {
-  const { shopId, owner_id } = req.query;
+  const { shopId, owner_id } = req.body;
 
   if (shopId) {
     const findMenus = await Menu.findAll({

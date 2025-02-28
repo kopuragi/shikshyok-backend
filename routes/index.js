@@ -8,7 +8,9 @@ const menu = require("../controller/Cmenu");
 const userController = require("../controller/UserController");
 const shopController = require("../controller/ShopController");
 const moneyController = require("../controller/MoneyController");
+
 const orderController = require("../controller/OrderController");
+
 
 //s3설정
 const multer = require("multer");
@@ -52,7 +54,9 @@ router.patch("/owner-review", review.CusReviewDelete);
 router.delete("/owner-review/:id", review.deleteOwnerReview);
 
 // GET /api-server/menu-list
-router.get("/menu-list", menu.getMenus);
+
+router.post("/menu-list", menu.getMenus);
+
 
 // POST /api-server/menu-register
 router.post("/menu-register", upload.single("image"), menu.createMenus);
@@ -93,9 +97,11 @@ router.get("/createCustomer", userController.createCustomers);
 //모든상점 조회
 router.get("/getShop", shopController.getShop);
 
+
 router.get("/getOwner/:shopLoginId", shopController.getOwner);
 
 router.post("/addOrder", orderController.addOrder);
+
 
 //사용자 리뷰 get /api-sever/review
 router.get("/review", review.getReview);
