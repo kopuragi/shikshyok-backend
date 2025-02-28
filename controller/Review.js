@@ -245,12 +245,12 @@ exports.CusReviewDelete = async (req, res) => {
 //----------- 회원 주문목록 전체
 exports.OrderAll = async (req, res) => {
   try {
-    console.log(req.query);
+    console.log("여기---", req.query);
     const orderList = await Order.findAll({
-      where: { user_id: req.query.cus_id },
+      where: { cus_order_id: req.query.id },
     });
 
-    console.log(orderList);
+    console.log("조회값=", orderList);
     res.status(200).json({ orderList });
   } catch (err) {
     console.error(err);
