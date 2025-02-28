@@ -5,6 +5,12 @@ const OrderMenu = (sequelize, DataTypes) => {
       shop_order_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: "order",
+          shop_order_id: "id",
+        },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
       },
       menuName: {
         type: DataTypes.STRING(255),

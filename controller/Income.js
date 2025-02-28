@@ -4,11 +4,11 @@ const { Op, fn, col } = require("sequelize");
 exports.orderMenu = async (req, res) => {
   try {
     const { startDate, endDate, shopId } = req.body;
-    const result = await OrderedMenu.findAll({
+
+    const result = await Order.findAll({
       where: {
         visitTime: {
-          [Sequelize.Op.gte]: new Date(startDate),
-          [Sequelize.Op.lt]: new Date(endDate),
+          [Op.between]: [new Date(startDate), new Date(endDate)],
         },
         shop_order_id: shopId,
       },
@@ -16,17 +16,9 @@ exports.orderMenu = async (req, res) => {
         "visitTime",
         "menuName",
         "price",
-        [
-          Sequelize.fn("SUM", Sequelize.col("orderedMenu.totalPrice")),
-          "totalPrice",
-        ],
+        [Sequelize.fn("SUM", Sequelize.col("Order.totalPrice")), "totalPrice"], // order 테이블에서 totalPrice 가져오기
       ],
-      include: [
-        {
-          model: Order,
-          attributes: [],
-        },
-      ],
+
       group: ["visitTime", "menuName", "price"],
       order: [["visitTime", "ASC"]],
     });
@@ -69,7 +61,16 @@ exports.orderMenu = async (req, res) => {
       groupedMenu[name].value += value;
     });
 
-    res.send({ menu, priceSum, datePerSum, groupedMenu });
+    res.send({
+      result,
+      menu,
+      priceSum,
+      datePerSum,
+      groupedMenu,
+      startDate,
+      endDate,
+      shopId,
+    });
   } catch (error) {
     console.error("Error :", error);
     res.status(500).send("Server error");
@@ -80,7 +81,7 @@ exports.orderVisitor = async (req, res) => {
   try {
     const { startDate, endDate, shopId } = req.body;
 
-    const result = await OrderedVisitor.findAll({
+    const result = await Order.findAll({
       where: {
         visitTime: {
           [Op.gte]: new Date(startDate),
@@ -134,16 +135,15 @@ exports.reVisitor = async (req, res) => {
   try {
     const { startDate, endDate, shopId } = req.body;
 
-    const result = await OrderedVisitor.findAll({
+    const result = await Order.findAll({
       where: {
         visitTime: {
           [Sequelize.Op.gte]: new Date(startDate),
-          [Sequelize.Op.lt]: new Date(endDate),
+          [Sequelize.Op.lte]: new Date(endDate),
         },
         shop_order_id: shopId,
       },
       attributes: ["user_id", "visitors", "visitTime"],
-      include: [{ model: Order, attributes: [] }],
     });
     const reVisit = result.map((el) => el.toJSON());
 
