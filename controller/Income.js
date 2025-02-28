@@ -2,9 +2,9 @@ const db = require("../models");
 const { OrderedMenu, Order, Sequelize, OrderedVisitor } = db;
 const { Op, fn, col } = require("sequelize");
 exports.orderMenu = async (req, res) => {
-  const { startDate, endDate, shopId } = req.body;
-  console.log(shopId);
   try {
+    const { startDate, endDate, shopId } = req.body;
+    console.log(shopId);
     const result = await OrderedMenu.findAll({
       where: {
         visitTime: {
@@ -70,7 +70,7 @@ exports.orderMenu = async (req, res) => {
       groupedMenu[name].value += value;
     });
 
-    res.send({ menu, priceSum, datePerSum, groupedMenu });
+    res.send({ shopId, menu, priceSum, datePerSum, groupedMenu });
   } catch (error) {
     console.error("Error :", error);
     res.status(500).send("Server error");
@@ -134,6 +134,7 @@ exports.orderVisitor = async (req, res) => {
 exports.reVisitor = async (req, res) => {
   try {
     const { startDate, endDate, shopId } = req.body;
+    const shop_order_id = shopId.toSt;
     const result = await OrderedVisitor.findAll({
       where: {
         visitTime: {
