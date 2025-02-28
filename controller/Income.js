@@ -2,9 +2,8 @@ const db = require("../models");
 const { OrderedMenu, Order, Sequelize, OrderedVisitor } = db;
 const { Op, fn, col } = require("sequelize");
 exports.orderMenu = async (req, res) => {
-  const { startDate, endDate, shopId } = req.body;
-  console.log(shopId);
   try {
+    const { startDate, endDate, shopId } = req.body;
     const result = await OrderedMenu.findAll({
       where: {
         visitTime: {
@@ -134,6 +133,7 @@ exports.orderVisitor = async (req, res) => {
 exports.reVisitor = async (req, res) => {
   try {
     const { startDate, endDate, shopId } = req.body;
+
     const result = await OrderedVisitor.findAll({
       where: {
         visitTime: {
