@@ -371,7 +371,7 @@ exports.updateUserProfile = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
     }
-
+    if (nickname) user.nickname = nickname; // 닉네임 업데이트 추가
     if (email) user.email = email;
 
     if (password && newPassword) {
@@ -382,11 +382,11 @@ exports.updateUserProfile = async (req, res) => {
       user.pw = await bcrypt.hash(newPassword, 10);
     }
 
-    if (name) user.name = name;
-    if (gender) user.gender = gender;
+    // 나머지 필드 업데이트
     if (phoneNumber) user.phone = phoneNumber;
     if (address) user.address = address;
 
+    // 기업회원 정보 업데이트
     if (membershipType === 'business') {
       if (companyName) user.ownerShopname = companyName;
       if (businessType) user.ownerShoptype = businessType;
