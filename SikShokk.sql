@@ -123,4 +123,3 @@ INSERT INTO menu (shop_menu_id, menuName, price, menudesc, category) VALUES
 INSERT INTO menu (shop_menu_id, menuName, price, menudesc, category) VALUES 
 (8, '사과주스',4000,'시트러스 향이 나는 홍차','주스');
 
-

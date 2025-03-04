@@ -7,13 +7,14 @@ const { Shop, Review, Reviewfile, Customer, Order, sequelize } = db;
 const dotenv = require("dotenv");
 const multer = require("multer");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const fs = require("fs");
 dotenv.config();
 //-- AWS 1붙임
 const s3Client = new S3Client({
-  region: process.env.AWS_S3_REGION1,
+  region: process.env.AWS_S3_REGION,
   credentials: {
-    accessKeyId: process.env.AWS_S3_ACCESS_KEY1,
-    secretAccessKey: process.env.AWS_S3_SECRET_ACCESS_KEY1,
+    accessKeyId: process.env.AWS_S3_ACCESS_KEY,
+    secretAccessKey: process.env.AWS_S3_SECRET_ACCESS_KEY,
   },
 });
 
@@ -21,13 +22,19 @@ const upload1 = multer({
   storage: multer.memoryStorage(),
 });
 
+// 업로드
 const uploadFile = async (file) => {
   try {
     if (file) {
+      const fileContent = file.buffer; // 파일 경로 대신 버퍼로 수정
+      const decodeFile = Buffer.from(file.originalname, "binary").toString(
+        "utf-8"
+      );
+
       const uploadParams = {
-        Bucket: process.env.AWS_S3_BUCKET1,
-        Key: Date.now().toString() + "-" + file.originalname,
-        Body: file.buffer,
+        Bucket: process.env.AWS_S3_BUCKET,
+        Key: `${Date.now()}-${decodeFile}`, // 파일 이름 설정
+        Body: fileContent,
         ACL: "public-read",
       };
 
@@ -35,7 +42,7 @@ const uploadFile = async (file) => {
       const data = await s3Client.send(command);
       const fileInfo = {
         key: uploadParams.Key,
-        location: `https://${uploadParams.Bucket}.s3.${process.env.AWS_S3_REGION1}.amazonaws.com/${uploadParams.Key}`,
+        location: `https://${uploadParams.Bucket}.s3.${process.env.AWS_S3_REGION}.amazonaws.com/${uploadParams.Key}`,
       };
       // 등록된 파일의 key 값과 location 확인
       console.log("File uploaded successfully:"); //, data임 원래
@@ -45,7 +52,9 @@ const uploadFile = async (file) => {
     }
   } catch (error) {
     console.error("Error uploading data: ", error);
-    res.status(500).send(error);
+    if (res) {
+      res.status(500).send(error);
+    }
   }
 };
 
