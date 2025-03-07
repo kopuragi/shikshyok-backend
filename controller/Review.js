@@ -95,10 +95,12 @@ exports.postReview = async (req, res) => {
 
   try {
     const fileInfo = req.file ? await uploadFile(req.file) : null; // 파일 업로드 처리
-    const { reviewText, star, orderId, shopId } = req.body;
+    const { reviewText, star, orderId, shopId, cus_order_id } = req.body;
     //--- 확인용들
     console.log("글", reviewText);
     console.log("별", star);
+    console.log("별", star);
+    console.log("회원", cus_order_id);
     console.log("주문ID", orderId);
     console.log("가게ID", shopId);
     console.log("파일", req.file);
@@ -107,7 +109,7 @@ exports.postReview = async (req, res) => {
     // 1️ -- Review 테이블에 리뷰 저장
     const newReview = await Review.create(
       {
-        cus_rev_id: orderId, // 고객 ID 숫자
+        cus_rev_id: cus_order_id, // 고객 ID 숫자
         shop_id: shopId, // 가게 ID  숫자
         score: star, // 별점  숫자
         content: reviewText, // 리뷰 내용
