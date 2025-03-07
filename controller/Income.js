@@ -4,32 +4,36 @@ const { Op, fn, col } = require("sequelize");
 exports.orderMenu = async (req, res) => {
   try {
     const { startDate, endDate, shopId } = req.body;
-
+    const endDateWithTime = new Date(endDate);
+    endDateWithTime.setHours(23, 59, 59, 999);
     const result = await Order.findAll({
       where: {
         visitTime: {
-          [Op.between]: [new Date(startDate), new Date(endDate)],
+          [Op.between]: [new Date(startDate), endDateWithTime],
         },
         shop_order_id: shopId,
       },
       attributes: [
         "visitTime",
         "menuName",
-        "price",
-        [Sequelize.fn("SUM", Sequelize.col("Order.totalPrice")), "totalPrice"], // order 테이블에서 totalPrice 가져오기
+        // "totalPrice",
+        [Sequelize.fn("SUM", Sequelize.col("Order.price")), "price"],
       ],
-
-      group: ["visitTime", "menuName", "price"],
-      order: [["visitTime", "ASC"]],
+      group: ["visitTime", "menuName"],
+      order: [
+        ["visitTime", "ASC"],
+        ["menuName", "ASC"],
+      ],
     });
 
     const menu = result.map((el) => el.toJSON());
-    const priceSum = menu.reduce((sum, menu) => sum + menu.totalPrice, 0);
+    const priceSum = menu.reduce((sum, menu) => sum + menu.price, 0);
     const datePerSum = menu.reduce((sum, menu) => {
-      if (sum[menu.visitTime]) {
-        sum[menu.visitTime].매출 += menu.totalPrice;
+      const visitDate = new Date(menu.visitTime).toISOString().split("T")[0];
+      if (sum[visitDate]) {
+        sum[visitDate].매출 += menu.price;
       } else {
-        sum[menu.visitTime] = { 날짜: menu.visitTime, 매출: menu.totalPrice };
+        sum[visitDate] = { 날짜: visitDate, 매출: menu.price };
       }
       return sum;
     }, {});
@@ -48,7 +52,7 @@ exports.orderMenu = async (req, res) => {
       const name = item.menuName;
       const price = Number(item.price);
       const totalPrice = Number(item.totalPrice);
-      const value = totalPrice / price;
+      const value = price;
 
       if (!groupedMenu[name]) {
         groupedMenu[name] = {
@@ -62,14 +66,10 @@ exports.orderMenu = async (req, res) => {
     });
 
     res.send({
-      result,
       menu,
       priceSum,
       datePerSum,
       groupedMenu,
-      startDate,
-      endDate,
-      shopId,
     });
   } catch (error) {
     console.error("Error :", error);
@@ -80,12 +80,13 @@ exports.orderMenu = async (req, res) => {
 exports.orderVisitor = async (req, res) => {
   try {
     const { startDate, endDate, shopId } = req.body;
-
+    const endDateWithTime = new Date(endDate);
+    endDateWithTime.setHours(23, 59, 59, 999);
     const result = await Order.findAll({
       where: {
         visitTime: {
           [Op.gte]: new Date(startDate),
-          [Op.lte]: new Date(endDate),
+          [Op.lte]: endDateWithTime,
         },
         shop_order_id: shopId,
       },
@@ -134,12 +135,13 @@ exports.orderVisitor = async (req, res) => {
 exports.reVisitor = async (req, res) => {
   try {
     const { startDate, endDate, shopId } = req.body;
-
+    const endDateWithTime = new Date(endDate);
+    endDateWithTime.setHours(23, 59, 59, 999);
     const result = await Order.findAll({
       where: {
         visitTime: {
           [Sequelize.Op.gte]: new Date(startDate),
-          [Sequelize.Op.lte]: new Date(endDate),
+          [Sequelize.Op.lte]: endDateWithTime,
         },
         shop_order_id: shopId,
       },
@@ -152,10 +154,10 @@ exports.reVisitor = async (req, res) => {
         acc[visitor.user_id] = {
           userId: visitor.user_id,
           number: 0,
-          isReVisit: false,
+          isReVisit: true,
         };
       } else {
-        acc[visitor.user_id].isReVisit = true;
+        acc[visitor.user_id].isReVisit = false;
       }
       acc[visitor.user_id].number += Number(visitor.visitors);
       return acc;
